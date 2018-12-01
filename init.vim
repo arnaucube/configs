@@ -1,6 +1,3 @@
-"" github.com/arnaucube/configs
-
-
 call plug#begin(expand('~/.config/nvim/plugged'))
 
 Plug 'scrooloose/nerdtree'
@@ -52,6 +49,7 @@ set number
 set title
 set titlestring=nvim-%F
 set t_Co=256
+set cursorline
 " colorscheme one
 " set background=dark
 
@@ -71,10 +69,19 @@ if (empty($TMUX))
     set termguicolors
   endif
 endif
+
 set background=dark " for the dark version
 " set background=light " for the light version
-colorscheme one
+" colorscheme one
+colorscheme molokai
 
+if $COLORTERM == 'gnome-terminal'
+  set term=gnome-256color
+else
+  if $TERM == 'xterm'
+    set term=xterm-256color
+  endif
+endif
 
 set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\
 
@@ -159,3 +166,6 @@ let g:go_highlight_space_tab_error = 0
 let g:go_highlight_array_whitespace_error = 0
 let g:go_highlight_trailing_whitespace_error = 0
 let g:go_highlight_extra_types = 1
+
+"" esc mapping
+inoremap jk <ESC>
