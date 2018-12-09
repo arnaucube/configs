@@ -16,8 +16,12 @@ else
 fi
 unset color_prompt force_color_prompt
 
+# gitg branch views, line from https://gitlab.com/dhole/dot_files/blob/master/.bash_aliases#L39
+alias gitg="git log --color --graph --abbrev-commit --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%ar)%C(cyan) %an<%ae>%Creset'"
+
 # nvim alias
 alias n='nvim'
+alias t='tmux'
 
 # go
 export PATH=$PATH:/usr/local/go/bin
