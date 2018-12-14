@@ -8,6 +8,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'Raimondi/delimitMate'
 Plug 'scrooloose/syntastic'
 Plug 'scrooloose/nerdcommenter'
+Plug 'majutsushi/tagbar'
 
 " go
 Plug 'fatih/vim-go' " Amazing combination of features.
@@ -94,6 +95,7 @@ let g:airline_theme='one'
 let g:airline#extensions#syntastic#enabled = 1
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#buffer_nr_show = 1
 let g:airline#extensions#tagbar#enabled = 1
 let g:airline_skip_empty_sections = 1
 
@@ -127,6 +129,10 @@ noremap <C-j> <C-w>j
 noremap <C-k> <C-w>k
 noremap <C-l> <C-w>l
 noremap <C-h> <C-w>h
+
+" scroll
+set scrolloff=5               " keep at least 5 lines above/below
+set sidescrolloff=5           " keep at least 5 lines left/right
 
 
 " syntastic
@@ -169,3 +175,4 @@ let g:go_highlight_extra_types = 1
 
 "" esc mapping
 inoremap jk <ESC>
+tnoremap jk <C-\><C-n>

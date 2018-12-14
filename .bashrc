@@ -19,7 +19,12 @@ unset color_prompt force_color_prompt
 # gitg branch views, line from https://gitlab.com/dhole/dot_files/blob/master/.bash_aliases#L39
 alias gitg="git log --color --graph --abbrev-commit --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%ar)%C(cyan) %an<%ae>%Creset'"
 
-# nvim alias
+# ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# nvim & tmux alias
 alias n='nvim'
 alias t='tmux'
 
@@ -34,3 +39,5 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # python
 alias python='/usr/bin/python3.6'
 alias pip='/usr/bin/pip3'
+
+export EDITOR=nvim
