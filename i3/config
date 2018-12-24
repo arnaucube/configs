@@ -30,7 +30,8 @@ font pango:monospace 8
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec i3-sensible-terminal
+# bindsym $mod+Return exec i3-sensible-terminal
+bindsym $mod+Return exec xfce4-terminal
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -123,7 +124,7 @@ bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
-bindsym $mod+Control+l exec i3lock -i ~/wallpapers/geometry02_croped1366x768_pixelized.png 
+bindsym $mod+Control+l exec i3lock -i ~/wallpapers/geometry02_croped1366x768_pixelized.png -c 000000
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -176,3 +177,7 @@ bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightne
 exec redshift-gtk
 exec feh --bg-fill ~/wallpapers/geometry02_croped1920x1080.png 
 exec xmodmap .Xmodmap
+
+# move current workspace to another display
+bindsym $mod+Control+1 move workspace to output HDMI-2
+bindsym $mod+Control+0 move workspace to output eDP-1
