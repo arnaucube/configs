@@ -1,0 +1,8 @@
+ReadTags = yes
+MusicDir = ~/Music
+StartInMusicDir = yes
+XTerms = xterm-256color
+Theme = green_theme
+MOCDir = ~/.moc
+UseRCC = no
+Keymap = keymap
