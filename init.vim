@@ -1,14 +1,22 @@
 call plug#begin(expand('~/.config/nvim/plugged'))
 
+" NERDTree
 Plug 'scrooloose/nerdtree'
 Plug 'jistr/vim-nerdtree-tabs'
+Plug 'scrooloose/nerdcommenter'
+
+" vim-airline
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+
+" syntastic
+Plug 'scrooloose/syntastic'
+
 Plug 'airblade/vim-gitgutter'
 Plug 'Raimondi/delimitMate'
-Plug 'scrooloose/syntastic'
-Plug 'scrooloose/nerdcommenter'
 Plug 'majutsushi/tagbar'
+
+" rainbow parentheses
 Plug 'kien/rainbow_parentheses.vim'
 
 " go
@@ -31,18 +39,29 @@ Plug 'jelera/vim-javascript-syntax'
 Plug 'davidhalter/jedi-vim'
 Plug 'raimon49/requirements.txt.vim', {'for': 'requirements'}
 
+" deoplete
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'zchee/deoplete-go', {'build': {'unix': 'make'}}
+" neosnippet with deoplete
+Plug 'Shougo/neosnippet.vim'
+Plug 'Shougo/neosnippet-snippets'
+let g:deoplete#enable_at_startup = 1
+" Plugin deoplete neosnippet key-mappings.
+" Note: It must be "imap" and "smap".  It uses <Plug> mappings.
+imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+xmap <C-k>     <Plug>(neosnippet_expand_target)
+
 
 " colors
 Plug 'tomasr/molokai'
 Plug 'srcery-colors/srcery-vim'
 Plug 'rakr/vim-one'
 Plug 'morhetz/gruvbox'
+let g:srcery_italic = 1
+
 
 call plug#end()
-
-" setup
 
 " visual
 syntax on
@@ -52,8 +71,7 @@ set title
 set titlestring=nvim-%F
 set t_Co=256
 set cursorline
-" colorscheme one
-" set background=dark
+set background=dark " for the dark version
 
 "Credit joshdick
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
@@ -72,11 +90,6 @@ if (empty($TMUX))
   endif
 endif
 
-set background=dark " for the dark version
-" set background=light " for the light version
-" colorscheme one
-colorscheme molokai
-
 if $COLORTERM == 'gnome-terminal'
   set term=gnome-256color
 else
@@ -87,7 +100,69 @@ endif
 
 set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\
 
-" rainbow parentheses
+
+" go
+let g:go_auto_sameids = 1
+
+"" go config
+function! s:build_go_files()
+  let l:file = expand('%')
+  if l:file =~# '^\f\+\.go$'
+    call go#cmd#Build(0)
+  endif
+endfunction
+
+
+let g:go_list_type = "quickfix"
+let g:go_fmt_command = "goimports"
+let g:go_fmt_fail_silently = 1
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_generate_tags = 1
+let g:go_highlight_space_tab_error = 0
+let g:go_highlight_array_whitespace_error = 0
+let g:go_highlight_trailing_whitespace_error = 0
+let g:go_highlight_extra_types = 1
+
+" NERDTree
+let NERDTreeShowHidden=1
+autocmd vimenter * NERDTree
+map <C-n> :NERDTreeToggle<CR>
+" NERDCommenter
+let g:NERDSpaceDelims = 1 " Add spaces after comment delimiters by default
+let g:NERDDefaultAlign = 'left' " Align line-wise comment delimiters flush left instead of following code indentation
+let g:NERDCommentEmptyLines = 1 " Allow commenting and inverting empty lines (useful when commenting a region)
+
+
+" vim-airline
+"" let g:airline_theme = 'powerlineish'
+let g:airline_theme='one'
+let g:airline#extensions#syntastic#enabled = 1
+let g:airline#extensions#branch#enabled = 1
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#buffer_nr_show = 1
+let g:airline#extensions#tagbar#enabled = 1
+let g:airline_skip_empty_sections = 1
+
+
+" syntastic
+let g:syntastic_always_populate_loc_list=1
+let g:syntastic_error_symbol='✗'
+let g:syntastic_warning_symbol='⚠'
+let g:syntastic_style_error_symbol = '✗'
+let g:syntastic_style_warning_symbol = '⚠'
+let g:syntastic_auto_loc_list=1
+let g:syntastic_aggregate_errors = 1
+let g:syntastic_go_checkers = ['golint', 'govet']
+let g:syntastic_python_checkers = []
+let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['go'] }
+
+" rainbowparentheses
 let g:rbpt_colorpairs = [
     \ ['brown',       'RoyalBlue3'],
     \ ['Darkblue',    'SeaGreen3'],
@@ -113,19 +188,6 @@ au Syntax * RainbowParenthesesLoadRound
 au Syntax * RainbowParenthesesLoadSquare
 au Syntax * RainbowParenthesesLoadBraces
 
-" go
-let g:go_auto_sameids = 1
-
-" vim-airline
-"" let g:airline_theme = 'powerlineish'
-let g:airline_theme='one'
-let g:airline#extensions#syntastic#enabled = 1
-let g:airline#extensions#branch#enabled = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#buffer_nr_show = 1
-let g:airline#extensions#tagbar#enabled = 1
-let g:airline_skip_empty_sections = 1
-
 " abbreviations
 cnoreabbrev W! w!
 cnoreabbrev Q! q!
@@ -138,68 +200,19 @@ cnoreabbrev W w
 cnoreabbrev Q q
 cnoreabbrev Qall qall
 
-let g:deoplete#enable_at_startup = 1
-let g:srcery_italic = 1
-
-" NERDTree
-let NERDTreeShowHidden=1
-autocmd vimenter * NERDTree
-map <C-n> :NERDTreeToggle<CR>
-
-" NERDCommenter
-let g:NERDSpaceDelims = 1 " Add spaces after comment delimiters by default
-let g:NERDDefaultAlign = 'left' " Align line-wise comment delimiters flush left instead of following code indentation
-let g:NERDCommentEmptyLines = 1 " Allow commenting and inverting empty lines (useful when commenting a region)
-
 "" Switching windows
 noremap <C-j> <C-w>j
 noremap <C-k> <C-w>k
 noremap <C-l> <C-w>l
 noremap <C-h> <C-w>h
 
+"" esc mapping
+inoremap jk <ESC>
+tnoremap jk <C-\><C-n>
+
 " scroll
 set scrolloff=5               " keep at least 5 lines above/below
 set sidescrolloff=5           " keep at least 5 lines left/right
 
 
-" syntastic
-let g:syntastic_always_populate_loc_list=1
-let g:syntastic_error_symbol='✗'
-let g:syntastic_warning_symbol='⚠'
-let g:syntastic_style_error_symbol = '✗'
-let g:syntastic_style_warning_symbol = '⚠'
-let g:syntastic_auto_loc_list=1
-let g:syntastic_aggregate_errors = 1
-
-"" go config
-
-function! s:build_go_files()
-  let l:file = expand('%')
-  if l:file =~# '^\f\+\.go$'
-    call go#cmd#Build(0)
-  endif
-endfunction
-
-
-let g:go_list_type = "quickfix"
-let g:go_fmt_command = "goimports"
-let g:go_fmt_fail_silently = 1
-let g:syntastic_go_checkers = ['golint', 'govet']
-let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['go'] }
-
-let g:go_highlight_types = 1
-let g:go_highlight_fields = 1
-let g:go_highlight_functions = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_build_constraints = 1
-let g:go_highlight_structs = 1
-let g:go_highlight_generate_tags = 1
-let g:go_highlight_space_tab_error = 0
-let g:go_highlight_array_whitespace_error = 0
-let g:go_highlight_trailing_whitespace_error = 0
-let g:go_highlight_extra_types = 1
-
-"" esc mapping
-inoremap jk <ESC>
-tnoremap jk <C-\><C-n>
+colorscheme molokai
