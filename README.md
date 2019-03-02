@@ -19,3 +19,8 @@ config files
 - Redshift `redshift.conf`
 	- in `~/.conf/redshift.conf`
 - i3 config files `/i3` and `/i3status` directories go inside `~/.conf/` directory
+
+
+### server side
+- radicale `config`
+	- in `~/.conf/radicale/config`

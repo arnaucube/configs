@@ -1,0 +1,10 @@
+[General]
+Binary = calcurse
+Hostname = sub.domain.com
+Path = /calendarname/path/
+SyncFilter = cal
+DryRun = No
+[Auth]
+AuthMethod = basic
+Username = username
+Password = password
