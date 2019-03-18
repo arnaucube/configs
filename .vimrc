@@ -49,3 +49,8 @@ set sidescrolloff=5           " keep at least 5 lines left/right
 
 
 colorscheme gruvbox
+
+let &t_SI.="\e[6 q" "SI = INSERT mode
+let &t_SR.="\e[4 q" "SR = REPLACE mode
+let &t_EI.="\e[2 q" "EI = NORMAL mode (ELSE)
+

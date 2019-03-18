@@ -24,9 +24,10 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
-# nvim & tmux alias
+# alias
 alias n='nvim'
 alias t='tmux'
+alias c='calcurse-caldav && calcurse && calcurse-caldav'
 
 # go
 export PATH=$PATH:/usr/local/go/bin
@@ -40,4 +41,4 @@ export PATH="$HOME/.cargo/bin:$PATH"
 alias python='/usr/bin/python3.6'
 alias pip='/usr/bin/pip3'
 
-export EDITOR=nvim
+export EDITOR=vim
