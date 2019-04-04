@@ -1,2 +1,2 @@
 #!/bin/sh
-./sourceProgramsToInstall/Telegram/Telegram -many -workdir /home/xiaomi/telegramProfile2Data &
+./sourceProgramsToInstall/Telegram/Telegram -many -workdir ~/telegramProfile2Data &

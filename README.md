@@ -17,8 +17,8 @@ config files
 	- changes will be applied each session start
 	- to apply changes in the current session use `xmodmap ~/.Xmodmap`
 - Redshift `redshift.conf`
-	- in `~/.conf/redshift.conf`
-- i3 config files `/i3` and `/i3status` directories go inside `~/.conf/` directory
+	- in `~/.config/redshift.conf`
+- i3 config files `/i3` and `/i3status` directories go inside `~/.config/` directory
 
 
 ### server side

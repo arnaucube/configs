@@ -1,4 +1,4 @@
-# assumming that git is already installed and this repo is installed
+# assumming that git & vim are already installed and this repo is downloaded
 
 echo "updating"
 sudo apt-get update
@@ -8,11 +8,11 @@ echo "installing tmux"
 sudo apt-get -y install tmux
 
 echo "setting tmux config"
-cp ../.tmux.conf ~/.tmux.conf
+cp ./.tmux.conf ~/.tmux.conf
 
 # vim
 echo "setting vim config"
-cp ../.vimrc ~/.vimrc
+cp ./.vimrc ~/.vimrc
 
 # neovim
 echo "installing neovim"
@@ -21,9 +21,9 @@ curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 echo "setting nvim config"
-mkdir ~/config
-mkdir ~/config/nvim
-cp ../init.vim ~/.config/nvim/init.vim
+mkdir ~/.config
+mkdir ~/.config/nvim
+cp ./init.vim ~/.config/nvim/init.vim
 
 # vim & neovim PlugInstall
 echo "installing PlugInstall vim"

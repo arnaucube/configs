@@ -32,7 +32,6 @@ alias c='calcurse-caldav && calcurse && calcurse-caldav'
 # go
 export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
-export GO111MODULE=on
 
 # rust
 export PATH="$HOME/.cargo/bin:$PATH"
