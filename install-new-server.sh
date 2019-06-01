@@ -1,11 +1,11 @@
 # assumming that git & vim are already installed and this repo is downloaded
 
 echo "updating"
-sudo apt-get update
+apt-get update
 
 # tmux
 echo "installing tmux"
-sudo apt-get -y install tmux
+apt-get -y install tmux
 
 echo "setting tmux config"
 cp ./.tmux.conf ~/.tmux.conf
@@ -16,7 +16,7 @@ cp ./.vimrc ~/.vimrc
 
 # neovim
 echo "installing neovim"
-sudo apt-get -y install neovim
+apt-get -y install neovim
 curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
@@ -35,19 +35,19 @@ curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
 
 # bash
 echo "append .bashrc of this repo lines to the .bashrc system file"
-cat ../.bashrc >> ~/.bashrc
+cat .bashrc >> ~/.bashrc
 
 source .bashrc
 
 # go
-echo "installing go 1.11.5"
-wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.11.5.linux-amd64.tar.gz
+echo "installing go 1.12.5"
+wget https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz
+tar -C /usr/local -xzf go1.12.5.linux-amd64.tar.gz
 
 # nodejs
-echo "installing nodejs v8"
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-sudo apt-get install -y nodejs
+echo "installing nodejs v10"
+curl -sL https://deb.nodesource.com/setup_10.x | bash -
+apt-get install -y nodejs
 
 echo "installing npm http-server"
-sudo npm install -g http-server
+npm install -g http-server
