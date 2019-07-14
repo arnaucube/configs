@@ -2,6 +2,7 @@ call plug#begin(expand('~/.vim/plugged'))
 
 Plug 'scrooloose/nerdtree'
 map <C-n> :NERDTreeToggle<CR>
+let NERDTreeShowHidden=1
 
 "" Color
 Plug 'tomasr/molokai'
@@ -18,8 +19,15 @@ set title
 set titlestring=vim-%F
 set t_Co=256
 set cursorline
-
 set background=dark " for the dark version
+
+if $COLORTERM == 'gnome-terminal'
+  set term=gnome-256color
+else
+  if $TERM == 'xterm'
+    set term=xterm-256color
+  endif
+endif
 
 " abbreviations
 cnoreabbrev W! w!
