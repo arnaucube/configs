@@ -30,6 +30,7 @@ Plug 'rust-lang/rust.vim'
 set hidden
 let g:racer_cmd = "/home/user/.cargo/bin/racer"
 let g:racer_experimental_completer = 1
+let g:rustfmt_autosave = 1
 
 
 " javascript
@@ -197,5 +198,11 @@ tnoremap jk <C-\><C-n>
 set scrolloff=5               " keep at least 5 lines above/below
 set sidescrolloff=5           " keep at least 5 lines left/right
 
+"" circom syntax
+au BufRead,BufNewFile *.circom set filetype=circom
+au BufRead,BufNewFile *.circuit set filetype=go-snark-circuit
+
+" for file watching
+set backupcopy=yes
 
 colorscheme molokai
