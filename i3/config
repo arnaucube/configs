@@ -175,6 +175,7 @@ bindsym XF86MonBrightnessUp exec xbacklight -inc 20 # increase screen brightness
 bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightness
 
 exec redshift-gtk
+# having installed feh (sudo apt install feh)
 exec feh --bg-fill ~/MEGA/wallpapers/geometry02_croped1920x1080.png 
 exec xmodmap .Xmodmap
 
