@@ -1,6 +1,28 @@
 # configs
 config files
 
+## List of utilities for terminal
+- bat https://github.com/sharkdp/bat
+- rg https://github.com/BurntSushi/ripgrep
+- tig https://github.com/jonas/tig
+- gitg
+```
+alias gitg="git log --color --graph --abbrev-commit --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%ar)%C(cyan) %an<%ae>%Creset'"
+```
+- exa https://github.com/ogham/exa
+```
+alias ls='exa'
+alias lst='exa -l -snew'
+```
+- fd https://github.com/sharkdp/fd
+- jq https://github.com/stedolan/jq
+- tmux
+- nvim
+- mpsyt (mps-youtube) https://github.com/mps-youtube/mps-youtube
+- fzf https://github.com/junegunn/fzf
+
+
+---
 
 - NeoVim: `init.vim`
 	- in `.config/nvim/init.vim`
