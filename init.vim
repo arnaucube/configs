@@ -9,6 +9,9 @@ Plug 'scrooloose/nerdcommenter'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
+" vim-ripgrep
+Plug 'jremmen/vim-ripgrep'
+
 " syntastic
 Plug 'scrooloose/syntastic'
 
