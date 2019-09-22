@@ -55,3 +55,15 @@ npm install -g http-server
 echo "installing fzf fuzzy finder"
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 ~/.fzf/install
+
+
+# nginx
+apt install nginx -y
+
+# certbot
+apt-get update
+apt-get install software-properties-common -y
+add-apt-repository universe -y
+add-apt-repository ppa:certbot/certbot -y
+apt-get update
+apt-get install certbot python-certbot-nginx -y
