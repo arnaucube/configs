@@ -3,17 +3,24 @@
 #
 # after the default config
 
-# Show git branch name
+# Show git branch name and if there are files not commited show the number
 force_color_prompt=yes
 color_prompt=yes
 parse_git_branch() {
  git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
 }
+check_files_changed() {
+  if [ -d .git ]; then
+    if ((0!=$(git diff-index HEAD | wc -l))); then
+      echo "["$(git diff-index HEAD | wc -l)"]";
+    fi;
+  fi
+}
 if [ "$color_prompt" = yes ]; then
  # for username green:
- # PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[01;95m\]$(parse_git_branch)\[\033[00m\]\$ '
+ PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[01;95m\]$(parse_git_branch)\[\033[01;90m\]$(check_files_changed)\[\033[00m\]\$ '
  # for username pink:
- PS1='${debian_chroot:+($debian_chroot)}\[\033[01;33m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[01;95m\]$(parse_git_branch)\[\033[00m\]\$ '
+ # PS1='${debian_chroot:+($debian_chroot)}\[\033[01;33m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[01;95m\]$(parse_git_branch)\[\033[01;93m\]$(check_files_changed)\[\033[00m\]\$ '
 else
  PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w$(parse_git_branch)\$ '
 fi

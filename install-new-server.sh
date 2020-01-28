@@ -16,6 +16,7 @@ cp ./.vimrc ~/.vimrc
 
 # neovim
 echo "installing neovim"
+# alternative: apt-get install python3-neovim
 apt-get -y install neovim
 curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -56,6 +57,9 @@ echo "installing fzf fuzzy finder"
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 ~/.fzf/install
 
+echo "instaling ripgrep"
+curl -LO https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep_11.0.2_amd64.deb
+dpkg -i ripgrep_11.0.2_amd64.deb
 
 # nginx
 apt install nginx -y
