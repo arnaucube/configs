@@ -17,10 +17,11 @@ check_files_changed() {
   fi
 }
 if [ "$color_prompt" = yes ]; then
- # for username green:
- PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[01;95m\]$(parse_git_branch)\[\033[01;90m\]$(check_files_changed)\[\033[00m\]\$ '
- # for username pink:
- # PS1='${debian_chroot:+($debian_chroot)}\[\033[01;33m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[01;95m\]$(parse_git_branch)\[\033[01;93m\]$(check_files_changed)\[\033[00m\]\$ '
+   # to see the available colours: for COLOR in {1..255}; do echo -en "\e[38;5;${COLOR}m${COLOR} "; done; echo;
+ C_USER='48'
+ C_DIR='39'
+ C_BRANCH='207'
+ PS1='${debian_chroot:+($debian_chroot)}\[\e[01;38;5;'$C_USER'm\]\u@\h\[\033[00m\]:\[\e[01;38;5;'$C_DIR'm\]\w\[\e[38;5;'$C_BRANCH'm\]$(parse_git_branch)\[\033[01;90m\]$(check_files_changed)\[\033[00m\]\$ '
 else
  PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w$(parse_git_branch)\$ '
 fi
