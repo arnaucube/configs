@@ -1,5 +1,11 @@
 call plug#begin(expand('~/.config/nvim/plugged'))
 
+nnoremap <Space> <nop>
+let mapleader = "\<Space>"
+let g:mapleader = "\<Space>"
+let maplocalleader =  "\<Space>"
+
+
 " NERDTree
 Plug 'scrooloose/nerdtree'
 Plug 'jistr/vim-nerdtree-tabs'
@@ -11,9 +17,6 @@ Plug 'vim-airline/vim-airline-themes'
 
 " vim-ripgrep
 Plug 'jremmen/vim-ripgrep'
-
-" syntastic
-Plug 'scrooloose/syntastic'
 
 Plug 'airblade/vim-gitgutter'
 Plug 'Raimondi/delimitMate'
@@ -27,14 +30,10 @@ Plug 'fatih/vim-go' " Amazing combination of features.
 Plug 'godoctor/godoctor.vim' " Some refactoring tools
 
 " rust
-"" will need to install https://github.com/racer-rust/racer
-Plug 'racer-rust/vim-racer'
 Plug 'rust-lang/rust.vim'
-set hidden
-let g:racer_cmd = "/home/user/.cargo/bin/racer"
-let g:racer_experimental_completer = 1
+" set hidden
+let g:rustfmt_fail_silently = 0
 let g:rustfmt_autosave = 1
-
 
 " javascript
 Plug 'jelera/vim-javascript-syntax'
@@ -42,6 +41,9 @@ Plug 'jelera/vim-javascript-syntax'
 " python
 Plug 'davidhalter/jedi-vim'
 Plug 'raimon49/requirements.txt.vim', {'for': 'requirements'}
+
+" solidity
+Plug 'tomlion/vim-solidity'
 
 " deoplete
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -70,6 +72,12 @@ Plug 'toupeira/vim-desertink'
 Plug 'maksimr/Lucius2'
 let g:srcery_italic = 1
 
+" errors
+Plug 'Valloric/ListToggle'
+Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
 
 call plug#end()
 
@@ -152,7 +160,7 @@ let g:NERDCommentEmptyLines = 1 " Allow commenting and inverting empty lines (us
 " vim-airline
 "" let g:airline_theme = 'powerlineish'
 let g:airline_theme='one'
-let g:airline#extensions#syntastic#enabled = 1
+" let g:airline#extensions#syntastic#enabled = 1
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
@@ -160,17 +168,17 @@ let g:airline#extensions#tagbar#enabled = 1
 let g:airline_skip_empty_sections = 1
 
 
-" syntastic
-let g:syntastic_always_populate_loc_list=1
-let g:syntastic_error_symbol='✗'
-let g:syntastic_warning_symbol='⚠'
-let g:syntastic_style_error_symbol = '✗'
-let g:syntastic_style_warning_symbol = '⚠'
-let g:syntastic_auto_loc_list=1
-let g:syntastic_aggregate_errors = 1
-let g:syntastic_go_checkers = ['golint', 'govet']
-let g:syntastic_python_checkers = []
-let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['go'] }
+" errors
+"" for go needs gopls installed (comes with vim-go pluggin)
+"" for rust needs https://github.com/rust-lang/rls installed
+let g:lt_location_list_toggle_map = '<leader>l'
+let g:lt_quickfix_list_toggle_map = '<leader>s'
+let g:LanguageClient_serverCommands = {
+    \ 'go': ['~/go/bin/gopls'],
+    \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
+    \ }
+let g:LanguageClient_diagnosticsList = "Quickfix"
+let g:LanguageClient_diagnosticsEnable = 1
 
 " rainbowparentheses
 let g:rainbow_active = 1
@@ -186,6 +194,7 @@ cnoreabbrev WQ wq
 cnoreabbrev W w
 cnoreabbrev Q q
 cnoreabbrev Qall qall
+cnoreabbrev Qa qa
 
 "" Switching windows
 noremap <C-j> <C-w>j
