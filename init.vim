@@ -44,6 +44,8 @@ Plug 'raimon49/requirements.txt.vim', {'for': 'requirements'}
 
 " solidity
 Plug 'tomlion/vim-solidity'
+" circom
+Plug 'iden3/vim-circom-syntax'
 
 " deoplete
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
