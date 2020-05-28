@@ -1,4 +1,5 @@
 # static ip configuration
+# /etc/netplan/50-cloud-init.yaml
 
 network:
     ethernets:

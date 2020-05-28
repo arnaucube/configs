@@ -70,8 +70,6 @@ Plug 'tomasr/molokai'
 Plug 'srcery-colors/srcery-vim'
 Plug 'rakr/vim-one'
 Plug 'morhetz/gruvbox'
-Plug 'toupeira/vim-desertink'
-Plug 'maksimr/Lucius2'
 let g:srcery_italic = 1
 
 " errors
@@ -80,6 +78,9 @@ Plug 'autozimu/LanguageClient-neovim', {
     \ 'branch': 'next',
     \ 'do': 'bash install.sh',
     \ }
+
+" focus mode
+Plug 'junegunn/goyo.vim'
 
 call plug#end()
 
@@ -218,5 +219,9 @@ au BufRead,BufNewFile *.circuit set filetype=go-snark-circuit
 
 " for file watching
 set backupcopy=yes
+
+" shortcut for theme change
+nnoremap <F9> :colorscheme molokai \| set background=dark<CR>
+nnoremap <F10> :colorscheme one \| set background=light<CR>
 
 colorscheme molokai
