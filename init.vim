@@ -1,3 +1,5 @@
+source ~/.vimrc
+
 call plug#begin(expand('~/.config/nvim/plugged'))
 
 nnoremap <Space> <nop>
@@ -5,8 +7,7 @@ let mapleader = "\<Space>"
 let g:mapleader = "\<Space>"
 let maplocalleader =  "\<Space>"
 
-
-" NERDTree
+" nerdtree
 Plug 'scrooloose/nerdtree'
 Plug 'jistr/vim-nerdtree-tabs'
 Plug 'scrooloose/nerdcommenter'
@@ -65,13 +66,6 @@ smap <C-k>     <Plug>(neosnippet_expand_or_jump)
 xmap <C-k>     <Plug>(neosnippet_expand_target)
 
 
-" colors
-Plug 'tomasr/molokai'
-Plug 'srcery-colors/srcery-vim'
-Plug 'rakr/vim-one'
-Plug 'morhetz/gruvbox'
-let g:srcery_italic = 1
-
 " errors
 Plug 'Valloric/ListToggle'
 Plug 'autozimu/LanguageClient-neovim', {
@@ -82,17 +76,16 @@ Plug 'autozimu/LanguageClient-neovim', {
 " focus mode
 Plug 'junegunn/goyo.vim'
 
+" colors
+Plug 'tomasr/molokai'
+Plug 'srcery-colors/srcery-vim'
+Plug 'rakr/vim-one'
+Plug 'morhetz/gruvbox'
+Plug 'NLKNguyen/papercolor-theme'
+let g:srcery_italic = 1
+
 call plug#end()
 
-" visual
-syntax on
-set ruler
-set number
-set title
-set titlestring=nvim-%F
-set t_Co=256
-set cursorline
-set background=dark " for the dark version
 
 "Credit joshdick
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
@@ -120,6 +113,16 @@ else
 endif
 
 set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\
+
+
+" NERDTree
+let NERDTreeShowHidden=1
+autocmd vimenter * NERDTree
+map <C-n> :NERDTreeToggle<CR>
+" NERDCommenter
+let g:NERDSpaceDelims = 1 " Add spaces after comment delimiters by default
+let g:NERDDefaultAlign = 'left' " Align line-wise comment delimiters flush left instead of following code indentation
+let g:NERDCommentEmptyLines = 1 " Allow commenting and inverting empty lines (useful when commenting a region)
 
 
 " go
@@ -150,15 +153,6 @@ let g:go_highlight_array_whitespace_error = 0
 let g:go_highlight_trailing_whitespace_error = 0
 let g:go_highlight_extra_types = 1
 
-" NERDTree
-let NERDTreeShowHidden=1
-autocmd vimenter * NERDTree
-map <C-n> :NERDTreeToggle<CR>
-" NERDCommenter
-let g:NERDSpaceDelims = 1 " Add spaces after comment delimiters by default
-let g:NERDDefaultAlign = 'left' " Align line-wise comment delimiters flush left instead of following code indentation
-let g:NERDCommentEmptyLines = 1 " Allow commenting and inverting empty lines (useful when commenting a region)
-
 
 " vim-airline
 "" let g:airline_theme = 'powerlineish'
@@ -186,33 +180,6 @@ let g:LanguageClient_diagnosticsEnable = 1
 " rainbowparentheses
 let g:rainbow_active = 1
 
-" abbreviations
-cnoreabbrev W! w!
-cnoreabbrev Q! q!
-cnoreabbrev Qall! qall!
-cnoreabbrev Wq wq
-cnoreabbrev Wa wa
-cnoreabbrev wQ wq
-cnoreabbrev WQ wq
-cnoreabbrev W w
-cnoreabbrev Q q
-cnoreabbrev Qall qall
-cnoreabbrev Qa qa
-
-"" Switching windows
-noremap <C-j> <C-w>j
-noremap <C-k> <C-w>k
-noremap <C-l> <C-w>l
-noremap <C-h> <C-w>h
-
-"" esc mapping
-inoremap jk <ESC>
-tnoremap jk <C-\><C-n>
-
-" scroll
-set scrolloff=5               " keep at least 5 lines above/below
-set sidescrolloff=5           " keep at least 5 lines left/right
-
 "" circom syntax
 au BufRead,BufNewFile *.circom set filetype=circom
 au BufRead,BufNewFile *.circuit set filetype=go-snark-circuit
@@ -222,6 +189,6 @@ set backupcopy=yes
 
 " shortcut for theme change
 nnoremap <F9> :colorscheme molokai \| set background=dark<CR>
-nnoremap <F10> :colorscheme one \| set background=light<CR>
+nnoremap <F10> :colorscheme PaperColor \| set background=light<CR>
 
 colorscheme molokai
