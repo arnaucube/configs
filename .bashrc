@@ -21,7 +21,7 @@ if [ "$color_prompt" = yes ]; then
  C_USER='99' # 48 for normal green, 99 for server purple
  C_DIR='39'
  C_BRANCH='207'
- PS1='${debian_chroot:+($debian_chroot)}\[\e[01;38;5;'$C_USER'm\]\u@\h\[\033[00m\]:\[\e[01;38;5;'$C_DIR'm\]\w\[\e[38;5;'$C_BRANCH'm\]$(parse_git_branch)\[\033[01;90m\]$(check_files_changed)\[\033[00m\]\$ '
+ PS1='${debian_chroot:+($debian_chroot)}\[\e[01;38;5;'$C_USER'm\]\u@\h\[\033[00m\]:\[\e[01;38;5;'$C_DIR'm\]\w\[\e[38;5;'$C_BRANCH'm\]$(parse_git_branch)\[\033[01;90m\]\[\033[00m\]\$ '
 else
  PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w$(parse_git_branch)\$ '
 fi

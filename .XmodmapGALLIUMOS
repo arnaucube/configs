@@ -1,0 +1,15 @@
+!
+! Swap Caps_Lock and Control_L
+!
+
+remove control = Control_L
+remove mod1 = Alt_L
+remove mod4 = Super_L
+
+keysym Control_L = Alt_L
+keysym Super_L = Control_L
+keysym Alt_L = Super_L
+
+add control = Control_L
+add mod1 = Alt_L
+add mod4 = Super_L
