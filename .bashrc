@@ -34,11 +34,14 @@ alias gitg="git log --color --graph --abbrev-commit --pretty=format:'%Cred%h%Cre
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+alias lst='ls -altr'
 
 # alias
 alias n='nvim'
 alias t='tmux'
 alias c='calcurse-caldav && calcurse && calcurse-caldav'
+
+export PATH=$PATH:/home/user/bin
 
 # go
 export PATH=$PATH:/usr/local/go/bin
@@ -52,3 +55,4 @@ alias python='/usr/bin/python3.6'
 alias pip='/usr/bin/pip3'
 
 export EDITOR=vim
+export LC_ALL="en_US.UTF-8"
