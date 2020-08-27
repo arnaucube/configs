@@ -124,7 +124,8 @@ bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
-bindsym $mod+Control+l exec i3lock -i ~/MEGA/wallpapers/geometry02_croped1920x1080_pixelized.png -c 000000
+bindsym $mod+Control+l exec i3lock -i ~/Sync/wallpapers/geometry02_croped1920x1080_pixelized.png -c 000000
+bindsym $mod+Control+d exec poweroff
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -176,9 +177,11 @@ bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightne
 
 exec redshift-gtk
 # having installed feh (sudo apt install feh)
-exec feh --bg-fill ~/MEGA/wallpapers/geometry02_croped1920x1080.png 
+exec feh --bg-fill ~/Sync/wallpapers/geometry02_croped1920x1080.png 
 exec xmodmap .Xmodmap
 
 # move current workspace to another display
-bindsym $mod+Control+1 move workspace to output HDMI-2
-bindsym $mod+Control+0 move workspace to output eDP-1
+bindsym $mod+Control+k move workspace to output HDMI-2
+bindsym $mod+Control+j move workspace to output eDP-1
+bindsym $mod+Control+1 exec xrandr && xrandr --auto
+bindsym $mod+Control+2 exec xrandr --auto && xrandr --output HDMI-2 --above eDP-1

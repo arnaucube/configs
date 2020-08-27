@@ -1,4 +1,4 @@
-# assumming that git & vim are already installed and this repo is downloaded
+# assumming that curl & wget & git & vim are already installed and this repo is downloaded
 
 echo "updating"
 apt-get update
@@ -33,6 +33,9 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
 echo "installing PlugInstall neovim"
 curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+## once Plug installed, execute inside nvim:
+## :PlugInstall
+## :GoInstallBinaries
 
 # bash
 echo "append .bashrc of this repo lines to the .bashrc system file"
