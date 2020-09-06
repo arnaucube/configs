@@ -40,6 +40,7 @@ alias lst='ls -altr'
 alias n='nvim'
 alias t='tmux'
 alias c='calcurse-caldav && calcurse && calcurse-caldav'
+alias gdf='git difftool --tool=vimdiff'
 
 export PATH=$PATH:/home/user/bin
 

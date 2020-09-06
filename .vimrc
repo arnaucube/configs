@@ -1,9 +1,10 @@
-" call plug#begin(expand('~/.vim/plugged'))
-" 
-" 
-" 
-" 
-" call plug#end()
+call plug#begin(expand('~/.vim/plugged'))
+
+Plug 'morhetz/gruvbox'
+
+
+
+call plug#end()
 
 " visual
 syntax on
@@ -47,3 +48,5 @@ set background=dark
 hi statusline ctermfg=234 ctermbg=250
 hi LineNr ctermfg=246
 
+
+colorscheme gruvbox
