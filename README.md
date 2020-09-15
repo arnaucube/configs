@@ -24,7 +24,14 @@ alias lst='exa -l -snew'
 
 ---
 
+
+- Vim: `.vimrc`
+	- put `vimconfigbase.vim` into `~/`
+	- put `.vimrc` into `~/`
+	- install https://github.com/junegunn/vim-plug
+	- inside vim, execute: `:PlugInstall`
 - NeoVim: `init.vim`
+	- put `vimconfigbase.vim` into `~/`
 	- in `.config/nvim/init.vim`
 	- install https://github.com/junegunn/vim-plug
 	- inside neovim, execute: `:PlugInstall`

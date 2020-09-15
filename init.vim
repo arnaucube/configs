@@ -1,4 +1,4 @@
-source ~/.vimrc
+source ~/vimconfigbase.vim
 
 call plug#begin(expand('~/.config/nvim/plugged'))
 
@@ -26,6 +26,9 @@ Plug 'majutsushi/tagbar'
 " rainbow parentheses
 Plug 'luochen1990/rainbow'
 
+" git
+Plug 'tpope/vim-fugitive'
+
 " go
 Plug 'fatih/vim-go' " Amazing combination of features.
 Plug 'godoctor/godoctor.vim' " Some refactoring tools
@@ -48,17 +51,18 @@ Plug 'tomlion/vim-solidity'
 " circom
 Plug 'iden3/vim-circom-syntax'
 
-" deoplete
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'zchee/deoplete-go', {'build': {'unix': 'make'}}
-" neosnippet with deoplete
-Plug 'Shougo/neosnippet.vim'
-Plug 'Shougo/neosnippet-snippets'
+" 
+" " deoplete
+" Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+" Plug 'zchee/deoplete-go', {'build': {'unix': 'make'}}
+" " neosnippet with deoplete
+" Plug 'Shougo/neosnippet.vim'
+" Plug 'Shougo/neosnippet-snippets'
 
 " automatically adjust shiftwidth and expand tab based on current file
 Plug 'tpope/vim-sleuth'
 
-let g:deoplete#enable_at_startup = 1
+" let g:deoplete#enable_at_startup = 1
 " Plugin deoplete neosnippet key-mappings.
 " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
 imap <C-k>     <Plug>(neosnippet_expand_or_jump)

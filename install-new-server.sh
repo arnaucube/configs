@@ -13,6 +13,7 @@ cp ./.tmux.conf ~/.tmux.conf
 # vim
 echo "setting vim config"
 cp ./.vimrc ~/.vimrc
+cp ./vimconfigbase.vim ~/vimconfigbase.vim
 
 # neovim
 echo "installing neovim"
