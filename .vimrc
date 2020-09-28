@@ -2,12 +2,11 @@ source ~/vimconfigbase.vim
 
 call plug#begin(expand('~/.vim/plugged'))
 
-Plug 'morhetz/gruvbox'
-
-
+Plug 'jaredgorski/spacecamp'
 
 call plug#end()
 
 
+set termguicolors
 
-colorscheme gruvbox
+colorscheme spacecamp

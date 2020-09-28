@@ -39,3 +39,6 @@ set sidescrolloff=5           " keep at least 5 lines left/right
 set background=dark
 hi statusline ctermfg=234 ctermbg=250
 hi LineNr ctermfg=246
+
+" toggle for paste mode
+set pastetoggle=<F3>
