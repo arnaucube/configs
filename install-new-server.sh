@@ -65,6 +65,15 @@ echo "instaling ripgrep"
 curl -LO https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep_11.0.2_amd64.deb
 dpkg -i ripgrep_11.0.2_amd64.deb
 
+echo "install Rust"
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# assuming that Rust is installed
+echo "installing delta (gitdiff tool)"
+cargo install git-delta
+echo "append .gitconfig of this repo lines to the .gitconfig system file to use delta gitdiff tool"
+cat .gitconfig >> ~/.gitconfig
+
 # nginx
 apt install nginx -y
 
