@@ -176,7 +176,7 @@ au BufRead,BufNewFile *.circuit set filetype=go-snark-circuit
 set backupcopy=yes
 
 " shortcut for theme change
-nnoremap <F9> :colorscheme molokai \| set background=dark<CR>
+nnoremap <F9> :colorscheme gruvbox \| set background=dark \| highlight normal ctermbg=0 guibg=#000000 <CR>
 nnoremap <F10> :colorscheme gruvbox \| set background=light<CR>
 
 " colorscheme
@@ -184,6 +184,9 @@ let g:gruvbox_contrast_dark = 'hard'
 let g:gruvbox_contrast_light = 'hard'
 let g:srcery_italic = 1
 
+set background=dark 
 
 " colorscheme molokai
 colorscheme gruvbox
+
+highlight normal ctermbg=0 guibg=#000000

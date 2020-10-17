@@ -6,7 +6,6 @@ set title
 set titlestring=nvim-%F
 set t_Co=256
 set cursorline
-set background=dark " for the dark version
 
 " abbreviations
 cnoreabbrev W! w!
@@ -35,10 +34,8 @@ tnoremap jk <C-\><C-n>
 set scrolloff=5               " keep at least 5 lines above/below
 set sidescrolloff=5           " keep at least 5 lines left/right
 
-" colorscheme torte
-set background=dark
-hi statusline ctermfg=234 ctermbg=250
-hi LineNr ctermfg=246
+" line length
+" set textwidth=80
 
 " toggle for paste mode
 set pastetoggle=<F3>

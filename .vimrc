@@ -2,11 +2,13 @@ source ~/vimconfigbase.vim
 
 call plug#begin(expand('~/.vim/plugged'))
 
-Plug 'jaredgorski/spacecamp'
+Plug 'liuchengxu/space-vim-dark'
 
 call plug#end()
 
 
 set termguicolors
 
-colorscheme spacecamp
+colorscheme space-vim-dark
+set background=dark
+highlight normal ctermbg=0 guibg=#000000
