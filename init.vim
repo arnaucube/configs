@@ -113,9 +113,6 @@ let g:NERDDefaultAlign = 'left' " Align line-wise comment delimiters flush left 
 let g:NERDCommentEmptyLines = 1 " Allow commenting and inverting empty lines (useful when commenting a region)
 
 
-" go
-let g:go_auto_sameids = 1
-
 "" go config
 function! s:build_go_files()
   let l:file = expand('%')
@@ -164,6 +161,14 @@ let g:LanguageClient_serverCommands = {
     \ }
 let g:LanguageClient_diagnosticsList = "Quickfix"
 let g:LanguageClient_diagnosticsEnable = 1
+
+" language server key bindings
+nnoremap <F6> :call LanguageClient_contextMenu()<CR>
+" Specific mappings of LanguageClient each action separately
+nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
+nnoremap <silent> KK :call LanguageClient#textDocument_hover()<CR>
+nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
+nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
 
 " rainbowparentheses
 let g:rainbow_active = 1
