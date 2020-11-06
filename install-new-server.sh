@@ -50,8 +50,8 @@ wget https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.14.2.linux-amd64.tar.gz
 
 # nodejs
-echo "installing nodejs v10"
-curl -sL https://deb.nodesource.com/setup_10.x | bash -
+echo "installing nodejs v14"
+curl -sL https://deb.nodesource.com/setup_14.x | bash -
 apt-get install -y nodejs
 
 echo "installing npm http-server"
