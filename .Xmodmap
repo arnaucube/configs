@@ -1,9 +1,24 @@
 !
 ! Swap Caps_Lock and Control_L
 !
+! to reset to default: setxkbmap -option
+!
 remove Lock = Caps_Lock
 remove Control = Control_L
-keysym Control_L = Caps_Lock
+! keysym Control_L = Caps_Lock
+keysym Control_L = Mode_switch
 keysym Caps_Lock = Control_L
 add Lock = Caps_Lock
 add Control = Control_L
+
+! map numbers to more ergonomic position
+keycode  29 = y Y 1
+keycode  30 = u U 2
+keycode  31 = i I 3 
+keycode  43 = h H 4
+keycode  44 = j J 5
+keycode  45 = k K 6 
+keycode  57 = n N 7 
+keycode  58 = m M 8 
+keycode  59 = comma semicolon 9
+keycode  60 = period colon 0 
