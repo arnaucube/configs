@@ -185,3 +185,6 @@ bindsym $mod+Control+k move workspace to output HDMI-2
 bindsym $mod+Control+j move workspace to output eDP-1
 bindsym $mod+Control+1 exec xrandr && xrandr --auto
 bindsym $mod+Control+2 exec xrandr --auto && xrandr --output HDMI-2 --above eDP-1
+
+# keyboard language layout
+bindsym $mod+Control+0 exec sh ~/bin/keyboard-layout.sh

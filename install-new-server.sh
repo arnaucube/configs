@@ -74,6 +74,11 @@ cargo install git-delta
 echo "append .gitconfig of this repo lines to the .gitconfig system file to use delta gitdiff tool"
 cat .gitconfig >> ~/.gitconfig
 
+# install gotty (for terminal visualization sharing)
+wget https://github.com/yudai/gotty/releases/download/v1.0.1/gotty_linux_amd64.tar.gz
+tar -zxvf gotty_linux_amd64.tar.gz
+mv gotty /usr/gotty /usr/local/bin/
+
 # nginx
 apt install nginx -y
 
