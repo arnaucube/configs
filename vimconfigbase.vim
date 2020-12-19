@@ -39,3 +39,6 @@ set sidescrolloff=5           " keep at least 5 lines left/right
 
 " toggle for paste mode
 set pastetoggle=<F3>
+
+" set ignorecase  " do case insensitive search 
+set incsearch   " show incremental search results as you type

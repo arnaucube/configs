@@ -8,7 +8,6 @@ call plug#end()
 
 
 set termguicolors
-set term=xterm-256color
 
 colorscheme space-vim-dark
 set background=dark
