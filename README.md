@@ -48,6 +48,7 @@ alias lst='exa -l -snew'
 - Redshift `redshift.conf`
 	- in `~/.config/redshift.conf`
 - i3 config files `/i3` and `/i3status` directories go inside `~/.config/` directory
+- alacritty: copy `alacritty` dir into `~/.config/` directory
 
 
 ### server side

@@ -189,7 +189,8 @@ let g:gruvbox_contrast_dark = 'hard'
 let g:gruvbox_contrast_light = 'hard'
 let g:srcery_italic = 1
 
-set colorcolumn=100
+set colorcolumn=80
+set textwidth=80
 
 set background=dark 
 
