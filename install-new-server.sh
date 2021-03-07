@@ -39,6 +39,7 @@ curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
 ## :GoInstallBinaries
 
 # bash
+cp .bash_alias ~/.bash_alias
 echo "append .bashrc of this repo lines to the .bashrc system file"
 cat .bashrc >> ~/.bashrc
 

@@ -1,0 +1,15 @@
+# ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias lst='ls -altr'
+
+# alias
+alias n='nvim'
+alias t='tmux'
+
+# git alias
+alias gdf='git difftool --tool=vimdiff'
+alias gs='git status'
+# gitg branch views, line from https://gitlab.com/dhole/dot_files/blob/master/.bash_aliases#L39
+alias gitg="git log --color --graph --abbrev-commit --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%ar)%C(cyan) %an<%ae>%Creset'"

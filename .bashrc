@@ -27,21 +27,6 @@ else
 fi
 unset color_prompt force_color_prompt
 
-# gitg branch views, line from https://gitlab.com/dhole/dot_files/blob/master/.bash_aliases#L39
-alias gitg="git log --color --graph --abbrev-commit --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%ar)%C(cyan) %an<%ae>%Creset'"
-
-# ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-alias lst='ls -altr'
-
-# alias
-alias n='nvim'
-alias t='tmux'
-alias c='calcurse-caldav && calcurse && calcurse-caldav'
-alias gdf='git difftool --tool=vimdiff'
-
 export PATH=$PATH:/home/user/bin
 
 # go
@@ -57,3 +42,5 @@ alias pip='/usr/bin/pip3'
 
 export EDITOR=vim
 export LC_ALL="en_US.UTF-8"
+
+source ~/.bash_alias
