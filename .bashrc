@@ -43,4 +43,4 @@ alias pip='/usr/bin/pip3'
 export EDITOR=vim
 export LC_ALL="en_US.UTF-8"
 
-source ~/.bash_alias
+source ~/.sh_alias
