@@ -37,7 +37,9 @@ zstyle ':completion:*' verbose true
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
-source .sh_alias
+source ~/.sh_alias
+
+# to see the available colours: for COLOR in {1..255}; do echo -en "\e[38;5;${COLOR}m${COLOR} "; done; echo;
 
 PROMPT='%B%F{48}%n%F{white}:%F{39}%0~%f%b$ '
 
@@ -46,6 +48,22 @@ autoload -Uz vcs_info
 precmd_vcs_info() { vcs_info }
 precmd_functions+=( precmd_vcs_info )
 setopt prompt_subst
-RPROMPT=\$vcs_info_msg_0_%*
+RPROMPT=\$vcs_info_msg_0_%F{244}%*%f
 zstyle ':vcs_info:git:*' formats '%F{207}(%b)%f'
 zstyle ':vcs_info:*' enable git
+
+# go
+export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:~/go/bin
+export GOPATH=$HOME/go
+alias goimports="~/go/bin/goimports"
+alias golint="~/go/bin/golint"
+# alias benchcmp="~/go/bin/benchcmp"
+# export GOPHERJS_GOROOT="$(go1.12.16 env GOROOT)"
+
+# rust
+export PATH="$HOME/.cargo/bin:$PATH"
+
+export EDITOR=vim
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
