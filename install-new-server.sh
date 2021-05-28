@@ -47,8 +47,8 @@ source .bashrc
 
 # go
 echo "installing go 1.14.2"
-wget https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.14.2.linux-amd64.tar.gz
+wget https://golang.org/dl/go1.16.4.linux-amd64.tar.gz
+tar -C /usr/local -xzf go1.16.4.linux-amd64.tar.gz
 
 # nodejs
 echo "installing nodejs v14"

@@ -15,17 +15,18 @@ if [[ $1 == "help" ]]; then
   exit 0
 elif [[ $1 == "new" ]]; then
   # $2: lang, $3: container_name, $4: image_name
+  lang=$2
 
-  if [[ $2 == "rust" ]]; then
-    2="Dockerfile.rust"
-  elif [[ $2 == "go" ]]; then
-    2="Dockerfile.go"
+  if [[ $lang == "rust" ]]; then
+    lang="Dockerfile.rust"
+  elif [[ $lang == "go" ]]; then
+    lang="Dockerfile.go"
   else
     echo "available dockerfiles: go, rust"
     exit 0
   fi
 
-  sudo docker build -t $4 -f $2 .
+  sudo docker build -t $4 -f $lang .
   sudo docker run -it --entrypoint=/bin/bash --name $3 $4
   exit 0
 elif [[ $1 == "stop" ]]; then

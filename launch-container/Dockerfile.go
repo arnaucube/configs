@@ -19,8 +19,12 @@ RUN curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
 RUN curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-# install rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+# install go
+RUN wget https://golang.org/dl/go1.16.4.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.16.4.linux-amd64.tar.gz
+
+RUN echo "export PATH=$PATH:/usr/local/go/bin" >> ./bashrc
+RUN echo "export GOPATH=$HOME/go" >> ./bashrc
 
 RUN git clone https://github.com/arnaucube/configs.git && \
     cp configs/.vimrc ~/ && \
