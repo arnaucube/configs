@@ -1,0 +1,35 @@
+# FROM ubuntu:20.04
+FROM alpine:3.7
+
+RUN apt-get update && \
+    apt-get -y dist-upgrade && \
+    apt-get install -y \
+    apt-utils \
+    build-essential \
+    wget \
+    curl \
+    git \
+    neovim \
+    vim && \
+    apt-get clean
+
+RUN curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+RUN curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+RUN curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+# install rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+RUN git clone https://github.com/arnaucube/configs.git && \
+    cp configs/.vimrc ~/ && \
+    cp configs/vimconfigbase.vim ~/ && \
+    mkdir ~/.config && \
+    mkdir ~/.config/nvim && \
+    cp configs/init.vim ~/.config/nvim/
+
+WORKDIR /root
+
+ENTRYPOINT /bin/sh

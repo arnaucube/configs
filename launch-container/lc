@@ -1,0 +1,47 @@
+#!/bin/bash
+
+if [[ $1 == "help" ]]; then
+  echo "lc (Launch Container) help:
+===========================
+  - lc new <dockerfile> <container_name> <image_name>: create new image &
+  container using the selected dockerfile
+    - available dockerfiles: go, rust
+  - lc stop <container_name>: stop container
+  - lc rm <container_name>: remove container
+  - lc ls: list containers
+  - lc stop <container_name> <image_name>: stop container
+  - lc <container_name>: launch container
+  "
+  exit 0
+elif [[ $1 == "new" ]]; then
+  # $2: lang, $3: container_name, $4: image_name
+
+  if [[ $2 == "rust" ]]; then
+    2="Dockerfile.rust"
+  elif [[ $2 == "go" ]]; then
+    2="Dockerfile.go"
+  else
+    echo "available dockerfiles: go, rust"
+    exit 0
+  fi
+
+  sudo docker build -t $4 -f $2 .
+  sudo docker run -it --entrypoint=/bin/bash --name $3 $4
+  exit 0
+elif [[ $1 == "stop" ]]; then
+  # $2: container_name
+  sudo docker stop $2
+  exit 0
+elif [[ $1 == "rm" ]]; then
+  # $2: container_name
+  sudo docker stop $2
+  sudo docker rm $2
+  exit 0
+elif [[ $1 == "ls" ]]; then
+  sudo docker ps -a
+  exit 0
+fi
+
+# $1: container_name, $2: image_name
+sudo docker start $1
+sudo docker container exec -it $1 bash
