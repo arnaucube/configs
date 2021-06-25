@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+
+import os
+import subprocess
+
+d = os.popen("xrandr --listmonitors | grep '+' | awk {'print $4'}").read().splitlines()
+subprocess.run(["i3-msg", "move", "workspace", "to", "output", d[1]])

@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+
+import os
+import subprocess
+import sys
+
+print(sys.argv[1])
+
+setup = sys.argv[1]
+
+subprocess.run(["xrandr", "--auto"])
+
+d = os.popen("xrandr --listmonitors | grep '+' | awk {'print $4'}").read().splitlines()
+print(d[1])
+
+pos = "--above"
+if setup == "h":
+    pos="--right-of"
+elif setup == "ih":
+    pos="--left-of"
+elif setup == "v":
+    pos="--above"
+
+subprocess.run(["xrandr", "--output", d[1], pos, "eDP-1"])
