@@ -39,16 +39,16 @@ curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
 ## :GoInstallBinaries
 
 # bash
-cp .bash_alias ~/.bash_alias
+cp .sh_alias ~/.sh_alias
 echo "append .bashrc of this repo lines to the .bashrc system file"
 cat .bashrc >> ~/.bashrc
 
 source .bashrc
 
 # go
-echo "installing go 1.14.2"
-wget https://golang.org/dl/go1.16.4.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.16.4.linux-amd64.tar.gz
+echo "installing go 1.16.7"
+wget https://golang.org/dl/go1.16.7.linux-amd64.tar.gz
+tar -C /usr/local -xzf go1.16.7.linux-amd64.tar.gz
 
 # nodejs
 echo "installing nodejs v14"
@@ -68,6 +68,9 @@ dpkg -i ripgrep_11.0.2_amd64.deb
 
 echo "install Rust"
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# needed for later rust packages installations
+apt install build-essential
 
 # assuming that Rust is installed
 echo "installing delta (gitdiff tool)"
