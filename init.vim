@@ -170,6 +170,8 @@ nnoremap <silent> KK :call LanguageClient#textDocument_hover()<CR>
 nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
 nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
 
+noremap <silent> <C-c>          :cn<CR>
+
 " rainbowparentheses
 let g:rainbow_active = 1
 
@@ -190,7 +192,7 @@ let g:gruvbox_contrast_light = 'hard'
 let g:srcery_italic = 1
 
 set colorcolumn=100
-set textwidth=80
+" set textwidth=80
 
 set background=dark 
 

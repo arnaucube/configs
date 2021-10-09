@@ -22,3 +22,10 @@ elif setup == "v":
     pos="--above"
 
 subprocess.run(["xrandr", "--output", d[1], pos, "eDP-1"])
+
+if len(sys.argv)>2:
+    if sys.argv[2] == "4k":
+        print("4k")
+        # xrandr --output HDMI-2 --mode 3840x2160
+        subprocess.run(["xrandr", "--output", d[1], "--mode", "3840x2160"])
+

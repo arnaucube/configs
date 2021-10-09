@@ -23,8 +23,8 @@ RUN curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
 RUN wget https://golang.org/dl/go1.16.4.linux-amd64.tar.gz && \
     tar -C /usr/local -xzf go1.16.4.linux-amd64.tar.gz
 
-RUN echo "export PATH=$PATH:/usr/local/go/bin" >> ./bashrc
-RUN echo "export GOPATH=$HOME/go" >> ./bashrc
+RUN echo "export PATH=$PATH:/usr/local/go/bin" >> ./.bashrc
+RUN echo "export GOPATH=$HOME/go" >> ./.bashrc
 
 RUN git clone https://github.com/arnaucube/configs.git && \
     cp configs/.vimrc ~/ && \

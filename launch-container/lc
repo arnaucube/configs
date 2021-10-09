@@ -1,5 +1,7 @@
 #!/bin/bash
 
+path=${0::-3}
+
 if [[ $1 == "help" ]]; then
   echo "lc (Launch Container) help:
 ===========================
@@ -18,15 +20,16 @@ elif [[ $1 == "new" ]]; then
   lang=$2
 
   if [[ $lang == "rust" ]]; then
-    lang="Dockerfile.rust"
+    lang="$path/Dockerfile.rust"
   elif [[ $lang == "go" ]]; then
-    lang="Dockerfile.go"
+    lang="$path/Dockerfile.go"
   else
     echo "available dockerfiles: go, rust"
     exit 0
   fi
+  echo $lang
 
-  sudo docker build -t $4 -f $lang .
+  sudo docker build -t $4 -f $lang $path/.
   sudo docker run -it --entrypoint=/bin/bash --name $3 $4
   exit 0
 elif [[ $1 == "stop" ]]; then
