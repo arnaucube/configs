@@ -182,6 +182,10 @@ au BufRead,BufNewFile *.circuit set filetype=go-snark-circuit
 " for file watching
 set backupcopy=yes
 
+" copy&paste from system clipboard
+vnoremap  <leader>y  "+y
+vnoremap  <leader>p  "+p
+
 " shortcut for theme change
 nnoremap <F9> :colorscheme gruvbox \| set background=dark \| highlight normal ctermbg=0 guibg=#000000 <CR>
 nnoremap <F10> :colorscheme gruvbox \| set background=light<CR>
