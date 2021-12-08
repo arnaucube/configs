@@ -29,3 +29,6 @@ if len(sys.argv)>2:
         # xrandr --output HDMI-2 --mode 3840x2160
         subprocess.run(["xrandr", "--output", d[1], "--mode", "3840x2160"])
 
+        # restart i3 status bar to avoid being frozen
+        subprocess.run(["i3-msg", "restart"])
+

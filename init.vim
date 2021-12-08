@@ -179,6 +179,11 @@ let g:rainbow_active = 1
 au BufRead,BufNewFile *.circom set filetype=circom
 au BufRead,BufNewFile *.circuit set filetype=go-snark-circuit
 
+"" sage syntax
+augroup filetypedetect
+  au! BufRead,BufNewFile *.sage,*.spyx,*.pyx setfiletype python
+augroup END
+
 " for file watching
 set backupcopy=yes
 

@@ -51,8 +51,8 @@ wget https://golang.org/dl/go1.17.1.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.17.1.linux-amd64.tar.gz
 
 # nodejs
-echo "installing nodejs v14"
-curl -sL https://deb.nodesource.com/setup_14.x | bash -
+echo "installing nodejs v16"
+curl -sL https://deb.nodesource.com/setup_16.x | bash -
 apt-get install -y nodejs
 
 echo "installing npm http-server"
