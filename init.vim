@@ -80,6 +80,11 @@ Plug 'autozimu/LanguageClient-neovim', {
 " focus mode
 Plug 'junegunn/goyo.vim'
 
+" vimwiki
+Plug 'vimwiki/vimwiki'
+" vim calendar
+Plug 'mattn/calendar-vim'
+
 " colors
 Plug 'tomasr/molokai'
 Plug 'srcery-colors/srcery-vim'
@@ -88,6 +93,15 @@ Plug 'morhetz/gruvbox'
 
 call plug#end()
 
+" next 3 lines are needed for vimwiki
+set nocompatible
+filetype plugin on
+syntax on
+" vimwiki with markdown
+let g:vimwiki_list = [{'path': '~/vimwiki/',
+                      \ 'syntax': 'markdown', 'ext': '.md'}]
+" prevent vimwiki of setting conceallevel=2:
+let g:vimwiki_conceallevel=0
 
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 set termguicolors
