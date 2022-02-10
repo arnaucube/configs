@@ -19,8 +19,6 @@ cp ./vimconfigbase.vim ~/vimconfigbase.vim
 echo "installing neovim"
 # alternative: apt-get install python3-neovim
 apt-get -y install neovim
-curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 echo "setting nvim config"
 mkdir ~/.config
