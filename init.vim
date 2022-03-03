@@ -54,23 +54,23 @@ Plug 'iden3/vim-circom-syntax'
 " LaTeX support. It needs latexmk & zathura
 Plug 'lervag/vimtex'
 
-" 
-" " deoplete
-" Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+
+" deoplete
+Plug 'Shougo/deoplete.nvim'
+let g:deoplete#enable_at_startup = 1
+autocmd CompleteDone * pclose!
 " Plug 'zchee/deoplete-go', {'build': {'unix': 'make'}}
 " " neosnippet with deoplete
 " Plug 'Shougo/neosnippet.vim'
 " Plug 'Shougo/neosnippet-snippets'
+" " Plugin deoplete neosnippet key-mappings.
+" " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
+" imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+" smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+" xmap <C-k>     <Plug>(neosnippet_expand_target)
 
 " automatically adjust shiftwidth and expand tab based on current file
 Plug 'tpope/vim-sleuth'
-
-" let g:deoplete#enable_at_startup = 1
-" Plugin deoplete neosnippet key-mappings.
-" Note: It must be "imap" and "smap".  It uses <Plug> mappings.
-imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-smap <C-k>     <Plug>(neosnippet_expand_or_jump)
-xmap <C-k>     <Plug>(neosnippet_expand_target)
 
 
 " errors
@@ -79,6 +79,9 @@ Plug 'autozimu/LanguageClient-neovim', {
     \ 'branch': 'next',
     \ 'do': 'bash install.sh',
     \ }
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" after PlugInstall, install coc-rust-analyzer:
+" :CocInstall coc-rust-analyzer
 
 " focus mode
 Plug 'junegunn/goyo.vim'
@@ -169,12 +172,14 @@ let g:airline_skip_empty_sections = 1
 
 " errors
 "" for go needs gopls installed (comes with vim-go pluggin)
-"" for rust needs https://github.com/rust-lang/rls installed
+"" for rust with rust-analyzer needs https://rust-analyzer.github.io/manual.html#rust-analyzer-language-server-binary installed
+""      [old] for rust with rls needs https://github.com/rust-lang/rls installed
 let g:lt_location_list_toggle_map = '<leader>l'
 let g:lt_quickfix_list_toggle_map = '<leader>s'
+" \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
 let g:LanguageClient_serverCommands = {
     \ 'go': ['~/go/bin/gopls'],
-    \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
+    \ 'rust': ['rust-analyzer'],
     \ }
 let g:LanguageClient_diagnosticsList = "Quickfix"
 let g:LanguageClient_diagnosticsEnable = 1
