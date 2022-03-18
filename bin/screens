@@ -20,6 +20,8 @@ elif setup == "ih":
     pos="--left-of"
 elif setup == "v":
     pos="--above"
+elif setup=="mirror":
+    pos="--same-as"
 
 subprocess.run(["xrandr", "--output", d[1], pos, "eDP-1"])
 
