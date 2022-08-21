@@ -42,14 +42,17 @@ let g:rustfmt_autosave = 1
 " javascript
 Plug 'jelera/vim-javascript-syntax'
 
-" python
-Plug 'davidhalter/jedi-vim'
-Plug 'raimon49/requirements.txt.vim', {'for': 'requirements'}
+" python (disabled as puts conceallevel=2, which forces markdown
+" previsualization :S)
+" Plug 'davidhalter/jedi-vim'
+" Plug 'raimon49/requirements.txt.vim', {'for': 'requirements'}
 
 " solidity
 Plug 'tomlion/vim-solidity'
 " circom
 Plug 'iden3/vim-circom-syntax'
+" Cairo
+" Plug 'miguelmota/cairo.vim'
 
 " LaTeX support. It needs latexmk & zathura
 Plug 'lervag/vimtex'
@@ -98,16 +101,6 @@ Plug 'rakr/vim-one'
 Plug 'morhetz/gruvbox'
 
 call plug#end()
-
-" next 3 lines are needed for vimwiki
-set nocompatible
-filetype plugin on
-syntax on
-" vimwiki with markdown
-let g:vimwiki_list = [{'path': '~/vimwiki/',
-                      \ 'syntax': 'markdown', 'ext': '.md'}]
-" prevent vimwiki of setting conceallevel=2:
-let g:vimwiki_conceallevel=0
 
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 set termguicolors
@@ -171,8 +164,9 @@ let g:airline_skip_empty_sections = 1
 
 
 " errors
-"" for go needs gopls installed (comes with vim-go pluggin)
-"" for rust with rust-analyzer needs https://rust-analyzer.github.io/manual.html#rust-analyzer-language-server-binary installed
+"" For go needs gopls installed (comes with vim-go pluggin)
+"" For rust with rust-analyzer needs https://rust-analyzer.github.io/manual.html#rust-analyzer-language-server-binary installed
+""  --> place it at ~.local/bin or ~/bin and make sure that the PATH is defined (eg. in .zshrc: export PATH=$PATH:.local/bin)
 ""      [old] for rust with rls needs https://github.com/rust-lang/rls installed
 let g:lt_location_list_toggle_map = '<leader>l'
 let g:lt_quickfix_list_toggle_map = '<leader>s'
@@ -193,6 +187,17 @@ nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
 nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
 
 noremap <silent> <C-c>          :cn<CR>
+
+
+" next 3 lines are needed for vimwiki
+set nocompatible
+filetype plugin on
+syntax on
+" vimwiki with markdown
+let g:vimwiki_list = [{'path': '~/vimwiki/',
+                      \ 'syntax': 'markdown', 'ext': '.md'}]
+" prevent vimwiki of setting conceallevel=2:
+let g:vimwiki_conceallevel=0
 
 " rainbowparentheses
 let g:rainbow_active = 1
@@ -229,7 +234,7 @@ vnoremap  <leader>p  "+p
 
 " shortcut for theme change
 nnoremap <F9> :colorscheme gruvbox \| set background=dark \| highlight normal ctermbg=0 guibg=#000000 <CR>
-nnoremap <F10> :colorscheme gruvbox \| set background=light<CR>
+nnoremap <F10> :colorscheme one \| set background=light \| highlight normal guibg=#ffffff<CR>
 
 " colorscheme
 let g:gruvbox_contrast_dark = 'hard'
@@ -243,5 +248,6 @@ set background=dark
 
 " colorscheme molokai
 colorscheme gruvbox
+set conceallevel=0
 
 highlight normal ctermbg=0 guibg=#000000

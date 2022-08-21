@@ -3,4 +3,5 @@
 # clipboard
 
 CODE=$1
+python -m unicodeit.cli $CODE
 python -m unicodeit.cli $CODE | xclip -selection clipboard
