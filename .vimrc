@@ -40,6 +40,9 @@ let g:vimwiki_conceallevel=2
 " to allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
+" tab to translate into 2 spaces
+set shiftwidth=2
+
 set termguicolors
 
 colorscheme space-vim-dark
