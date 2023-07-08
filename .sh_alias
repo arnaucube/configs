@@ -22,3 +22,7 @@ alias gdf='git difftool --tool=vimdiff'
 alias gs='git status'
 # gitg branch views, line from https://gitlab.com/dhole/dot_files/blob/master/.bash_aliases#L39
 alias gitg="git log --color --graph --abbrev-commit --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%ar)%C(cyan) %an<%ae>%Creset'"
+
+alias python=python3
+
+alias cat='bat --theme="Monokai Extended" --style=plain'
