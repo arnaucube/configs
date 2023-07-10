@@ -67,4 +67,9 @@ export PATH="$HOME/.cargo/bin:$PATH"
 export EDITOR=vim
 export LC_ALL="en_US.UTF-8"
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# fzf
+[ -f ~/.fzf.zsh ]
+if [ -n "${commands[fzf-share]}" ]; then
+  source "$(fzf-share)/key-bindings.zsh"
+  source "$(fzf-share)/completion.zsh"
+fi

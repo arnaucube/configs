@@ -6,8 +6,8 @@ cp ./.tmux.conf ~/.tmux.conf
 cp ./vimconfigbase.vim ~/vimconfigbase.vim
 cp ./.vimrc ~/.vimrc
 
-mkdir ~/.config
-mkdir ~/.config/nvim
+mkdir -p ~/.config
+mkdir -p ~/.config/nvim
 cp ./init.vim ~/.config/nvim/init.vim
 
 cp ./.zshrc ~/.zshrc
@@ -18,9 +18,10 @@ cp ./bin/ltx ~/bin/
 cp ./bin/screens ~/bin/
 cp ./bin/wk ~/bin/
 
+cp -r ./alacritty ~/.config/
+cp -r ./i3status ~/.config/
+
 
 # assuming that Rust is installed
-echo "installing delta (gitdiff tool)"
-cargo install git-delta
 echo "append .gitconfig of this repo lines to the .gitconfig system file to use delta gitdiff tool"
 cat .gitconfig >> ~/.gitconfig

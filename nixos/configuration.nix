@@ -8,7 +8,7 @@
   imports =
     [
       ./hardware-configuration.nix
-      ./extra-hardware-configuration.nix
+      ./surface-extra-hardware-configuration.nix
       ./private-configuration.nix
     ];
 
@@ -80,6 +80,7 @@
 	tmux
 	git
 	delta
+	tig
 	mosh
 	bat
 	ripgrep
@@ -89,9 +90,18 @@
 	screenfetch
 	htop
 	alacritty
+	zathura
+	mate.atril
 	firefox
 	qutebrowser
+	chromium
+	xfce.ristretto
+	pavucontrol
   ];
+
+  programs.zsh.enable = true;
+  users.defaultUserShell = pkgs.zsh;
+  environment.shells = with pkgs; [zsh];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -100,9 +110,6 @@
   #   enable = true;
   #   enableSSHSupport = true;
   # };
-  programs.zsh.enable = true;
-  users.defaultUserShell = pkgs.zsh;
-  environment.shells = with pkgs; [zsh];
 
   # List services that you want to enable:
 
@@ -126,4 +133,7 @@
   # gvfs needed for Thunar to detect external disks
   services.gvfs.enable = true;
 
+  # bluetooth related
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
 }
