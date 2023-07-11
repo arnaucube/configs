@@ -29,4 +29,16 @@
 
   # add pulseaudio support to manage audio
   hardware.pulseaudio.enable = true;
+
+## NOTES:
+# Susspend issue:
+# https://github.com/linux-surface/linux-surface/wiki/Known-Issues-and-FAQ#suspend-aka-sleep-vs-lid-closingopening-events
+# run:
+# > sudo modprobe -r surface_gpe
+# and:
+# > sudo bash -c 'echo -e "\n# Blacklisting lid vs. suspend issue module\nblacklist surface_gpe" >> /etc/modprobe.d/blacklist.conf'
+#
+# Now folding the keyboard to the screen will not suspend and brick the
+# session, but you will need to manually suspend the session if saving battery
+# is desired.
 }

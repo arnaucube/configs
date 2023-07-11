@@ -97,6 +97,8 @@
 	chromium
 	xfce.ristretto
 	pavucontrol
+	sage
+	obs-studio
   ];
 
   programs.zsh.enable = true;
@@ -136,4 +138,9 @@
   # bluetooth related
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
+
+  # obs virtual camera
+  boot.extraModulePackages = with config.boot.kernelPackages; [
+    v4l2loopback
+  ];
 }

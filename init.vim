@@ -35,6 +35,8 @@ Plug 'luochen1990/rainbow'
 
 " git
 Plug 'tpope/vim-fugitive'
+" gitlink
+Plug 'mazubieta/gitlink-vim'
 
 " go
 Plug 'fatih/vim-go' " Amazing combination of features.
@@ -226,6 +228,15 @@ syntax enable
 " Viewer options: One may configure the viewer either by specifying a built-in
 " viewer method:
 let g:vimtex_view_method = 'zathura'
+
+"" gitlink
+function! CopyGitLink(...) range
+  redir @+
+  silent echo gitlink#GitLink(get(a:, 1, 0))
+  redir END
+endfunction
+nmap <leader>gl :call CopyGitLink()<CR>
+vmap <leader>gl :call CopyGitLink(1)<CR>
 
 "" sage syntax
 augroup filetypedetect
