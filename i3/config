@@ -171,6 +171,8 @@ bar {
         status_command i3status
 }
 
+default_border pixel 1
+
 # having installed feh (sudo apt install feh)
 exec feh --bg-fill ~/Sync/wallpapers/geometry02_croped1920x1080.png 
 exec xmodmap .Xmodmap

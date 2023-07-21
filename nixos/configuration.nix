@@ -87,6 +87,7 @@
 	fzf
 	python3
 	xfce.thunar
+	xfce.xfconf # needed to save preferences of thunar
 	screenfetch
 	htop
 	alacritty
@@ -97,8 +98,25 @@
 	chromium
 	xfce.ristretto
 	pavucontrol
+	texlive.combined.scheme-medium # includes latexmk
+	#pgf-umlsd # latex diagrams
+	#pgf
+	(pkgs.texlive.combine {
+		inherit (pkgs.texlive)
+		scheme-medium
+		pgf
+		;
+	})
 	sage
-	obs-studio
+	rustup
+	gcc
+	go
+	nodejs
+	xclip # to make clipboard work in neovim
+	xfce.xfce4-screenshooter
+	mpv
+	xorg.xmodmap
+	gnupg
   ];
 
   programs.zsh.enable = true;
