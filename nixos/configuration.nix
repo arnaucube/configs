@@ -116,7 +116,7 @@
 	xfce.xfce4-screenshooter
 	mpv
 	xorg.xmodmap
-	gnupg
+	feh
   ];
 
   programs.zsh.enable = true;
