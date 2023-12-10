@@ -21,12 +21,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // clone repo https://github.com/qmk/qmk_firmware into ~/qmk_firmware
 // copy this file into ~/qmk_firmware/keyboards/crkbd/keymaps/default/keymap.c
 // copy qmk.ini into ~/
+//
 // compile the keymap:
 // > qmk compile -kb crkbd -km default
+//
 // once keyboard connected, execute:
 // > qmk flash
+//
 // or if previous doesn't work, use:
 // > qmk flash -kb crkbd -km default
+//
+// and lately it needs the '-bl dfu' too:
+// > qmk flash -bl dfu -kb crkbd -km default
+//
+// If the right side does not work or acts as it were the left side, in
+// keyboards/crkbd/keymaps/default/config.h add:
+// #define SPLIT_USB_DETECT
 
 #include QMK_KEYBOARD_H
 

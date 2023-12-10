@@ -25,3 +25,11 @@ cp ../.tmux.conf ~/.tmux.conf
 
 echo "append .bashrc of this repo lines to the .bashrc system file"
 cat ../.bashrc >> ~/.bashrc
+
+# Additionally, fix the IP:
+# vim /etc/dhcpcd.conf:
+#
+# interface eth0
+# static ip_address=192.168.1.150/24
+# static routers=192.168.1.1
+# static domain_name_servers=192.168.1.1
