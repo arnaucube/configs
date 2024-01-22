@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# Script to remove all 'target' subdirectories. Used to get back disk space
+# from unused rust repos.
+
+echo "current dir size:"
+du -hs
+echo ""
+
+echo "removing subdirs:"
+find . -type d -name "target" # find & print
+find . -type d -name "target" -exec rm -rf {} + # find & rm
+
+echo ""
+echo "dir size after removing all 'target' subdirs:"
+du -hs
