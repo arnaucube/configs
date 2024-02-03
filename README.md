@@ -54,3 +54,26 @@ alias lst='exa -l -snew'
 ### server side
 - radicale `config`
 	- in `~/.conf/radicale/config`
+
+## swap file
+```bash
+# create swap file
+> dd if=/dev/zero of=./swapfile bs=1GB count=40
+
+# add permisions
+> chmod 600 ./swapfile
+
+# format the swapfile
+> mkswap ./swapfile
+
+# enable swap on swapfile
+> swapon ./swapfile
+
+# check that it is enabled
+> swapon --show
+
+
+# make swap persistent:
+# add the following line at the end of the /etc/fstab file
+~/swapfile swap swap defaults 0 0
+```

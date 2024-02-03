@@ -61,14 +61,15 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 ~/.fzf/install
 
 echo "instaling ripgrep"
-curl -LO https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep_11.0.2_amd64.deb
-dpkg -i ripgrep_11.0.2_amd64.deb
+# curl -LO https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep_13.0.0_amd64.deb
+# dpkg -i ripgrep_13.0.0_amd64.deb
+apt install ripgrep -y
 
 echo "install Rust"
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # needed for later rust packages installations
-apt install build-essential
+apt install build-essential -y
 
 # assuming that Rust is installed
 echo "installing delta (gitdiff tool)"
