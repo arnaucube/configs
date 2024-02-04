@@ -25,4 +25,4 @@ alias gitg="git log --color --graph --abbrev-commit --pretty=format:'%Cred%h%Cre
 
 alias python=python3
 
-alias cat='bat --theme="Monokai Extended" --style=plain'
+# alias cat='bat --theme="Monokai Extended" --style=plain'
