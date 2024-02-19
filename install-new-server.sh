@@ -1,14 +1,17 @@
 # assumming that curl & wget & git & vim are already installed and this repo is downloaded
 
 echo "updating"
-apt-get update
+apt update
 
 # tmux
 echo "installing tmux"
-apt-get -y install tmux
+apt -y install tmux
 
 echo "setting tmux config"
 cp ./.tmux.conf ~/.tmux.conf
+
+echo "installing mosh"
+apt -y install mosh
 
 # vim
 echo "setting vim config"
@@ -17,8 +20,8 @@ cp ./vimconfigbase.vim ~/vimconfigbase.vim
 
 # neovim
 echo "installing neovim"
-# alternative: apt-get install python3-neovim
-apt-get -y install neovim
+# alternative: apt install python3-neovim
+apt -y install neovim
 
 echo "setting nvim config"
 mkdir ~/.config
@@ -51,7 +54,7 @@ tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz
 # nodejs
 echo "installing nodejs v16"
 curl -sL https://deb.nodesource.com/setup_16.x | bash -
-apt-get install -y nodejs
+apt install -y nodejs
 
 echo "installing npm http-server"
 npm install -g http-server
@@ -93,7 +96,7 @@ mv gotty /usr/gotty /usr/local/bin/
 apt install nginx -y
 
 # certbot
-apt-get update
+apt update
 apt-get install software-properties-common -y
 add-apt-repository universe -y
 add-apt-repository ppa:certbot/certbot -y
