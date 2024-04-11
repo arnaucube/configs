@@ -46,22 +46,23 @@ cat .bashrc >> ~/.bashrc
 
 source .bashrc
 
-# go
-echo "installing go 1.21.6"
-wget https://golang.org/dl/go1.21.6.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz
-
-# nodejs
-echo "installing nodejs v16"
-curl -sL https://deb.nodesource.com/setup_16.x | bash -
-apt install -y nodejs
-
-echo "installing npm http-server"
-npm install -g http-server
-
-echo "installing fzf fuzzy finder"
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
+# # go
+# echo "installing go 1.21.6"
+# wget https://golang.org/dl/go1.21.6.linux-amd64.tar.gz
+# tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz
+# 
+# # nodejs
+# echo "installing nodejs v16"
+# # curl -sL https://deb.nodesource.com/setup_16.x | bash -
+# curl -fsSL https://deb.nodesource.com/setup_21.x | bash -
+# apt install -y nodejs
+# 
+# echo "installing npm http-server"
+# npm install -g http-server
+# 
+# echo "installing fzf fuzzy finder"
+# git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+# ~/.fzf/install
 
 echo "instaling ripgrep"
 # curl -LO https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep_13.0.0_amd64.deb
@@ -81,24 +82,24 @@ cd btop
 bash install.sh
 cd ..
 
-# assuming that Rust is installed
-echo "installing delta (gitdiff tool)"
-cargo install git-delta
-echo "append .gitconfig of this repo lines to the .gitconfig system file to use delta gitdiff tool"
-cat .gitconfig >> ~/.gitconfig
-
-# install gotty (for terminal visualization sharing)
-wget https://github.com/yudai/gotty/releases/download/v1.0.1/gotty_linux_amd64.tar.gz
-tar -zxvf gotty_linux_amd64.tar.gz
-mv gotty /usr/gotty /usr/local/bin/
-
-# nginx
-apt install nginx -y
-
-# certbot
-apt update
-apt-get install software-properties-common -y
-add-apt-repository universe -y
-add-apt-repository ppa:certbot/certbot -y
-apt-get update
-apt-get install certbot python-certbot-nginx -y
+# # assuming that Rust is installed
+# echo "installing delta (gitdiff tool)"
+# cargo install git-delta
+# echo "append .gitconfig of this repo lines to the .gitconfig system file to use delta gitdiff tool"
+# cat .gitconfig >> ~/.gitconfig
+# 
+# # install gotty (for terminal visualization sharing)
+# wget https://github.com/yudai/gotty/releases/download/v1.0.1/gotty_linux_amd64.tar.gz
+# tar -zxvf gotty_linux_amd64.tar.gz
+# mv gotty /usr/gotty /usr/local/bin/
+# 
+# # nginx
+# apt install nginx -y
+# 
+# # certbot
+# apt update
+# apt-get install software-properties-common -y
+# add-apt-repository universe -y
+# add-apt-repository ppa:certbot/certbot -y
+# apt-get update
+# apt-get install certbot python-certbot-nginx -y
