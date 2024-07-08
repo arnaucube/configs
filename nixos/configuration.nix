@@ -83,6 +83,7 @@
 	tig
 	mosh
 	bat
+	lf
 	ripgrep
 	fzf
 	python3
