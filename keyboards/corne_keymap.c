@@ -37,6 +37,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // If the right side does not work or acts as it were the left side, in
 // keyboards/crkbd/keymaps/default/config.h add:
 // #define SPLIT_USB_DETECT
+//
+// and to change the part that has the usb connected:
+// #define MASTER_RIGHT
 
 #include QMK_KEYBOARD_H
 
