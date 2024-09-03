@@ -118,6 +118,19 @@
 	mpv
 	xorg.xmodmap
 	feh
+	kolourpaint
+  ];
+
+  fonts.packages = with pkgs; [
+    dina-font
+    proggyfonts
+    terminus_font
+    fira-code
+    liberation_ttf
+    noto-fonts
+    tamsyn
+    termsyn
+    gohufont
   ];
 
   programs.zsh.enable = true;
