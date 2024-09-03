@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Script to remove all 'target' subdirectories. Used to get back disk space
 # from unused rust repos.

@@ -34,3 +34,14 @@ if len(sys.argv)>2:
         # restart i3 status bar to avoid being frozen
         subprocess.run(["i3-msg", "restart"])
 
+
+
+
+
+# for fixing touch screen
+# Check the input device ID with `xinput`.
+# Check the display device name with `xrandr`.
+# `xinput map-to-output <ID> <NAME>`
+# eg. xinput map-to-output 12 eDP-1
+
+

@@ -1,6 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 # script to generate unicode from LaTeX code, and copy it into the
 # clipboard
+#
+# needs unicodeit installed:
+# > pip install unicodeit
 
 CODE=$1
 python -m unicodeit.cli $CODE

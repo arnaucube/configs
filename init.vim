@@ -94,6 +94,8 @@ Plug 'autozimu/LanguageClient-neovim', {
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " after PlugInstall, install coc-rust-analyzer:
 " :CocInstall coc-rust-analyzer
+" also run (outside vim, in a shell):
+" rustup component add rust-analyzer
 
 " focus mode
 Plug 'junegunn/goyo.vim'
@@ -249,6 +251,9 @@ set backupcopy=yes
 " copy&paste from system clipboard
 vnoremap  <leader>y  "+y
 vnoremap  <leader>p  "+p
+
+" disable mouse
+set mouse=
 
 " shortcut for theme change
 nnoremap <F9> :colorscheme gruvbox \| set background=dark \| highlight normal ctermbg=0 guibg=#000000 <CR>

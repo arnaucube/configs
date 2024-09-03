@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#
+# ssync = ServerSync
+# Script to copy repo files from laptop to server or viceversa, skipping the directories .git, target and node_modules.
+#
+# example of usage:
+# > ssync sf down path/to/remote/folder
+# > ssync sf up path/to/remote/folder
+
+SERVER=$1
+DIRECTION=$2
+REMOTE_DIR=$3
+
+if [ -z $SERVER ] ; then
+	echo "missing 1st argument (SERVER), ie. the server to connect (from the ssh config)"
+	exit 1
+fi
+
+if [ -z $DIRECTION ] ; then
+	echo "missing 2nd argument (DIRECTION), ie. uploading (u) or downloading (d)"
+	exit 1
+fi
+
+if [ -z $REMOTE_DIR ] ; then
+	echo "missing 3rd argument, the remote directory in the server (REMOTE_DIR)"
+	exit 1
+fi
+
+case $DIRECTION in
+	"up" )
+		echo "upload files to $REMOTE_DIR"
+		rsync -a -P --exclude={'.git','target','node_modules'} ./* $SERVER:~/$REMOTE_DIR/;;
+	"down" )
+		echo "download files from $REMOTE_DIR"
+		rsync -a -P --exclude={'.git','target','node_modules'} $SERVER:~/$REMOTE_DIR/ ./;;
+esac
