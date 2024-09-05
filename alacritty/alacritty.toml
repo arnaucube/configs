@@ -1,0 +1,26 @@
+[colors.primary]
+background = "#000000"
+foreground = "#ffffff"
+
+[font]
+size = 9.0
+
+[font.bold]
+family = "terminus"
+style = "Bold"
+
+[font.italic]
+family = "terminus"
+style = "MediumItalic"
+
+[font.normal]
+family = "terminus"
+style = "Regular"
+
+[[keyboard.bindings]]
+action = "SpawnNewInstance"
+key = "N"
+mods = "Control|Shift"
+
+[window]
+dynamic_padding = false
