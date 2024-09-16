@@ -47,6 +47,7 @@
 	xfce.thunar
 	xfce.xfconf # needed to save preferences of thunar
 	xfce.ristretto
+	xfce.tumbler # for thumbnails of imgs
 	pavucontrol
 
 	# other
@@ -61,14 +62,14 @@
 
 	# languages
 	texlive.combined.scheme-medium # includes latexmk
-	#pgf-umlsd # latex diagrams
-	#pgf
-	#(pkgs.texlive.combine {
-	#	inherit (pkgs.texlive)
-	#	scheme-medium
-	#	pgf
-	#	;
-	#})
+	pgf-umlsd # latex diagrams
+	pgf
+	(pkgs.texlive.combine {
+		inherit (pkgs.texlive)
+		scheme-medium
+		pgf
+		;
+	})
 	#gcc
 	clang
 	clang-tools
@@ -101,4 +102,8 @@
   users.defaultUserShell = pkgs.zsh;
   environment.shells = with pkgs; [zsh];
 
+  xdg.mime.enable=true;
+  xdg.mime.defaultApplications = {
+    "application/pdf" = "zathura";
+  };
 }
