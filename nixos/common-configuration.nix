@@ -49,6 +49,7 @@
 	xfce.ristretto
 	xfce.tumbler # for thumbnails of imgs
 	pavucontrol
+	jq
 
 	# other
 	mpv
@@ -61,29 +62,36 @@
 	chromium
 
 	# languages
-	texlive.combined.scheme-medium # includes latexmk
+	#texlive.combined.scheme-medium # includes latexmk
+	#texlivePackages.minted
 	pgf-umlsd # latex diagrams
 	pgf
 	(pkgs.texlive.combine {
 		inherit (pkgs.texlive)
-		scheme-medium
+		scheme-medium # includes latexmk
+		minted # syntax highligting
 		pgf
 		;
 	})
 	#gcc
 	clang
 	clang-tools
+	pkg-config
+	openssl
 	stdenv
 	rustup
 	sage
 	go
 	python3
+	pipx
 	nodejs
 
   ];
 
   environment.variables = {
  	LIBCLANG_PATH = "${pkgs.llvmPackages_17.libclang.lib}/lib";
+	PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
+	OPENSSL_DIR = "${pkgs.openssl.dev}";
   };
 
   fonts.packages = with pkgs; [

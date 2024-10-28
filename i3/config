@@ -173,6 +173,9 @@ bar {
 
 default_border pixel 1
 
+# notifications in a floating panel instead of a new tiling window
+for_window [window_role="alert"] floating enable
+
 # having installed feh (sudo apt install feh)
 exec feh --bg-fill ~/Sync/wallpapers/geometry02_croped1920x1080.png 
 exec xmodmap .Xmodmap
