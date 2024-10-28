@@ -9,6 +9,7 @@
 {
   imports =
     [
+      ./common-configuration.nix
       ./hardware-configuration.nix
       ./surface-extra-hardware-configuration.nix
       ./private-configuration.nix
@@ -73,67 +74,6 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-  	vim
-	neovim
- 	wget
-	tmux
-	git
-	delta
-	tig
-	mosh
-	bat
-	lf
-	ripgrep
-	fzf
-	python3
-	xfce.thunar
-	xfce.xfconf # needed to save preferences of thunar
-	screenfetch
-	htop
-	alacritty
-	zathura
-	mate.atril
-	firefox
-	qutebrowser
-	chromium
-	xfce.ristretto
-	pavucontrol
-	texlive.combined.scheme-medium # includes latexmk
-	#pgf-umlsd # latex diagrams
-	#pgf
-	(pkgs.texlive.combine {
-		inherit (pkgs.texlive)
-		scheme-medium
-		pgf
-		;
-	})
-	sage
-	rustup
-	gcc
-	go
-	nodejs
-	xclip # to make clipboard work in neovim
-	xfce.xfce4-screenshooter
-	mpv
-	xorg.xmodmap
-	feh
-	kolourpaint
-  ];
-
-  fonts.packages = with pkgs; [
-    dina-font
-    proggyfonts
-    terminus_font
-    fira-code
-    liberation_ttf
-    noto-fonts
-    tamsyn
-    termsyn
-    gohufont
-  ];
 
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;
