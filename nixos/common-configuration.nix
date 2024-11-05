@@ -50,6 +50,7 @@
 	xfce.tumbler # for thumbnails of imgs
 	pavucontrol
 	jq
+	keynav
 
 	# other
 	mpv
