@@ -1,12 +1,18 @@
 # UPDATE: for newer systems better directly use:
+#
+# install dhcpcd: sudo apt-get install dhcpcd5
+#
 # vim /etc/dhcpcd.conf:
 #
 # interface eth0
-# static ip_address=192.168.1.150/24
-# static routers=192.168.1.1
-# static domain_name_servers=192.168.1.1
+#   static ip_address=192.168.1.150/24
+#   static routers=192.168.1.1
+#   static domain_name_servers=192.168.1.1
 #
-# now reboot the rpi
+#
+# restart dhcpcd: sudo systemctl restart dhcpcd
+#
+# now reboot the rpi: sudo reboot
 
 
 # static ip configuration

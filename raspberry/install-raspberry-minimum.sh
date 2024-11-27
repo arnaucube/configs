@@ -3,18 +3,19 @@
 echo "updating"
 sudo apt-get update
 
-echo "installing neovim"
-sudo apt-get -y install neovim
-curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+echo "installing vim"
+sudo apt -y install vim
+
+echo "setting vim config"
+cp ./.vimrc ~/.vimrc
+cp ./vimconfigbase.vim ~/vimconfigbase.vim
+
+echo "installing PlugInstall vim"
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 echo "installing tmux"
 sudo apt-get -y install tmux
-
-echo "setting nvim config"
-mkdir ~/.config
-mkdir ~/.config/nvim
-cp ../init.vim ~/.config/nvim/init.vim
 
 echo "setting xmodmap config"
 cp ../.Xmodmap ~/.Xmodmap
@@ -24,7 +25,9 @@ echo "setting tmux config"
 cp ../.tmux.conf ~/.tmux.conf
 
 echo "append .bashrc of this repo lines to the .bashrc system file"
+cp ../.sh_alias ~/.sh_alias
 cat ../.bashrc >> ~/.bashrc
+source ../.bashrc
 
 # Additionally, fix the IP:
 # vim /etc/dhcpcd.conf:
