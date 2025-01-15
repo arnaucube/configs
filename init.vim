@@ -66,7 +66,6 @@ Plug 'iden3/vim-circom-syntax'
 " LaTeX support. It needs latexmk & zathura
 Plug 'lervag/vimtex'
 
-
 " deoplete
 Plug 'Shougo/deoplete.nvim'
 let g:deoplete#enable_at_startup = 1
@@ -110,6 +109,8 @@ Plug 'tomasr/molokai'
 Plug 'srcery-colors/srcery-vim'
 Plug 'rakr/vim-one'
 Plug 'morhetz/gruvbox'
+
+Plug 'szw/vim-maximizer'
 
 call plug#end()
 
@@ -245,15 +246,18 @@ augroup filetypedetect
   au! BufRead,BufNewFile *.sage,*.spyx,*.pyx setfiletype python
 augroup END
 
+"" wat (wasm) syntax
+autocmd BufNewFile,BufReadPost *.wat setlocal filetype=wast
+
+" maximize current split or return to previous
+noremap <C-w>m :MaximizerToggle<CR>
+
 " for file watching
 set backupcopy=yes
 
 " copy&paste from system clipboard
 vnoremap  <leader>y  "+y
 vnoremap  <leader>p  "+p
-
-" disable mouse
-set mouse=
 
 " shortcut for theme change
 nnoremap <F9> :colorscheme gruvbox \| set background=dark \| highlight normal ctermbg=0 guibg=#000000 <CR>

@@ -23,9 +23,7 @@
 
 
   environment.systemPackages = with pkgs; [
-	# minimal
-  	vim
-	neovim
+	# utilities
  	wget
 	tmux
 	git
@@ -33,29 +31,46 @@
 	tig
 	mosh
 	bat
-	lf
 	ripgrep
 	fzf
 	screenfetch
 	htop
+	jq
+	keynav
+	unzip
+	gnutar
+	xorg.xmodmap # keyboard remapping
+	xfce.xfce4-screenshooter
+
+	# code editors
+  	vim
+	neovim
+	vimHugeX # to make clipboard work in vim
+	xclip # to make clipboard work in neovim
+
+	# terminals
 	alacritty
+	kitty
+
+	# pdf
 	zathura
 	mate.atril
-	xclip # to make clipboard work in neovim
-	xorg.xmodmap
-	xfce.xfce4-screenshooter
+
+	# file explorers/managers
+	lf
+	yazi
 	xfce.thunar
 	xfce.xfconf # needed to save preferences of thunar
 	xfce.ristretto
 	xfce.tumbler # for thumbnails of imgs
-	pavucontrol
-	jq
-	keynav
 
-	# other
+	# media
+	pavucontrol
 	mpv
+	vlc
 	feh
 	kolourpaint
+	calibre
 
 	# browsers
 	firefox
@@ -81,12 +96,15 @@
 	openssl
 	stdenv
 	rustup
+	wabt # wasm binary toolkit
+	wasmedge # to execute wasm binaries
 	sage
 	go
-	python3
+	(python3.withPackages(ps: with ps; [
+		matplotlib numpy
+	]))
 	pipx
 	nodejs
-
   ];
 
   environment.variables = {

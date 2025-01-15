@@ -3,7 +3,7 @@
 DEVICE=$1
 
 if [ -z $DEVICE ] ; then
-	echo "missing 1st argument (DEVICE), ie. the name of the device where the backup is being done"
+	echo "missing 1st argument (DEVICE), ie. the name of the device where the backup is being done (eg. thinkpad, surface)"
 	exit 1
 fi
 
