@@ -1,5 +1,5 @@
 # This file is meant to be renamed to `configuration.nix`
-# Surface Go 2 NixOS configuration
+# Chuwi minibook NixOS configuration
 
 { config, pkgs, ... }:
 
@@ -8,7 +8,6 @@
     [
       ./common-configuration.nix
       ./hardware-configuration.nix
-      ./surface-extra-hardware-configuration.nix
       ./private-configuration.nix
     ];
 
@@ -16,25 +15,18 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Setup keyfile
-  boot.initrd.secrets = {
-    "/crypto_keyfile.bin" = null;
-  };
-
-  networking.hostName = "surface"; # Define your hostname.
+  networking.hostName = "chuwi"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Enable networking
   networking.networkmanager.enable = true;
+  hardware.cpu.intel.updateMicrocode = true;
+
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.userc = {
+  users.users.user = {
     isNormalUser = true;
-    description = "userc";
+    description = "user";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [];
   };
@@ -48,13 +40,27 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.05"; # Did you read the comment?
+  system.stateVersion = "24.11"; # Did you read the comment?
 
-  # gvfs needed for Thunar to detect external disks
-  services.gvfs.enable = true;
+  # Chuwi specific:
+  # fix wifi issues
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # obs virtual camera
-  boot.extraModulePackages = with config.boot.kernelPackages; [
-    v4l2loopback
+  # fix screen rotation issue
+  boot.kernelParams = [
+    "fbcon=rotate:1"
+  ];
+  services.xserver.xrandrHeads = [
+    {
+      monitorConfig = "Option \"Rotate\" \"right\"";
+      output = "DSI-1";
+    }
+  ];
+
+  # some extra packages
+  environment.systemPackages = with pkgs; [
+	# note taking
+	rnote
+	xournalpp
   ];
 }

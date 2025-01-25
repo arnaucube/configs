@@ -41,7 +41,9 @@ if len(sys.argv)>2:
 # for fixing touch screen
 # Check the input device ID with `xinput`.
 # Check the display device name with `xrandr`.
+#
 # `xinput map-to-output <ID> <NAME>`
 # eg. xinput map-to-output 12 eDP-1
-
-
+#
+# to rotate (90 degrees to right) the input of the touchscreen:
+# `xinput set-prop 'pointer:Goodix Capacitive TouchScreen' 'Coordinate Transformation Matrix' 0 1 0 -1 0 1 0 0 1`

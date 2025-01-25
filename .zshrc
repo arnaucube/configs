@@ -52,6 +52,8 @@ RPROMPT=\$vcs_info_msg_0_%F{244}%*%f
 zstyle ':vcs_info:git:*' formats '%F{207}(%b)%f'
 zstyle ':vcs_info:*' enable git
 
+export PATH=$PATH:~/bin
+
 # go
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:~/go/bin

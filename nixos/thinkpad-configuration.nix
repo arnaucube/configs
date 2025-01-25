@@ -1,8 +1,5 @@
 # This file is meant to be renamed to `configuration.nix`
-
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
+# Thinkpad NixOS configuration
 
 { config, pkgs, ... }:
 
@@ -18,34 +15,11 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "thinkpad"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Enable networking
   networking.networkmanager.enable = true;
-
-  services.displayManager = {
-      defaultSession = "none+i3";
-  };
-  services.xserver = {
-    xkb = { # Configure keymap in X11
-      layout = "us";
-      variant = "";
-    };
-
-    enable=true;
-    #displayManager = {
-    #  defaultSession = "none+i3";
-    #};
-    windowManager.i3 = {
-      enable=true;
-      extraPackages = with pkgs; [
-        dmenu
-        i3status
-        i3lock
-      ];
-    };
-  };
 
   # Define a user account
   users.users.user = {
@@ -69,10 +43,6 @@
 
   # gvfs needed for Thunar to detect external disks
   services.gvfs.enable = true;
-
-  # bluetooth related
-  hardware.bluetooth.enable = true;
-  services.blueman.enable = true;
 
   hardware.pulseaudio.enable = true;
 }

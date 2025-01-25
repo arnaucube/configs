@@ -14,12 +14,13 @@ cp ./.zshrc ~/.zshrc
 cp ./.sh_alias ~/.sh_alias
 
 mkdir -p ~/bin
-cp ./bin/ltx ~/bin/
-cp ./bin/screens ~/bin/
-cp ./bin/wk ~/bin/
+cp -r ./bin/* ~/bin/
 
 cp -r ./alacritty ~/.config/
 cp -r ./i3status ~/.config/
+
+mkdir -p ~/.config/zathura
+cp ./zathurarc ~/.config/zathura/
 
 
 # assuming that Rust is installed

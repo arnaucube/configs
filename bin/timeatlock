@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+current_time=$(date +"%H:%M")
+battery_level=$(cat "/sys/class/power_supply/BAT0/capacity")
+
+echo "timeatlock $current_time h, Battery level: $battery_level %"

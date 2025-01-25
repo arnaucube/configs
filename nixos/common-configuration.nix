@@ -21,6 +21,28 @@
     LC_TIME = "es_ES.UTF-8";
   };
 
+  services.displayManager = {
+      defaultSession = "none+i3";
+  };
+  services.xserver = {
+    xkb = { # Configure keymap in X11
+      layout = "us";
+      variant = "";
+    };
+
+    enable=true;
+    #displayManager = {
+    #  defaultSession = "none+i3";
+    #};
+    windowManager.i3 = {
+      enable=true;
+      extraPackages = with pkgs; [
+        dmenu
+        i3status
+        i3lock
+      ];
+    };
+  };
 
   environment.systemPackages = with pkgs; [
 	# utilities
@@ -41,6 +63,7 @@
 	gnutar
 	xorg.xmodmap # keyboard remapping
 	xfce.xfce4-screenshooter
+	pulseaudio
 
 	# code editors
   	vim
@@ -63,6 +86,11 @@
 	xfce.xfconf # needed to save preferences of thunar
 	xfce.ristretto
 	xfce.tumbler # for thumbnails of imgs
+	# for detecting usbs:
+	xfce.thunar-volman
+	gvfs
+	polkit_gnome
+	udiskie
 
 	# media
 	pavucontrol
@@ -93,7 +121,7 @@
 	clang
 	clang-tools
 	pkg-config
-	openssl
+	openssl.dev
 	stdenv
 	rustup
 	wabt # wasm binary toolkit
@@ -129,8 +157,21 @@
   users.defaultUserShell = pkgs.zsh;
   environment.shells = with pkgs; [zsh];
 
+  # set default pdf reader to zathura
   xdg.mime.enable=true;
+  environment.sessionVariables = {
+    BROWSER = "zathura";
+  };
   xdg.mime.defaultApplications = {
     "application/pdf" = "zathura";
   };
+
+  # gvfs needed for Thunar to detect external disks
+  services.gvfs.enable = true;
+
+  # bluetooth related
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
+
+  #hardware.pulseaudio.enable = true;
 }
