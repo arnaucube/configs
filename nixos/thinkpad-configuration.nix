@@ -45,4 +45,7 @@
   services.gvfs.enable = true;
 
   hardware.pulseaudio.enable = true;
+
+  # allow AppImage programs
+  programs.appimage.binfmt = true;
 }

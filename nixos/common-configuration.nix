@@ -64,6 +64,7 @@
 	xorg.xmodmap # keyboard remapping
 	xfce.xfce4-screenshooter
 	pulseaudio
+	usbutils
 
 	# code editors
   	vim
@@ -117,6 +118,7 @@
 		pgf
 		;
 	})
+	gnumake
 	#gcc
 	clang
 	clang-tools
@@ -129,10 +131,15 @@
 	sage
 	go
 	(python3.withPackages(ps: with ps; [
-		matplotlib numpy
+		matplotlib numpy qmk
 	]))
 	pipx
 	nodejs
+
+	# other
+	qmk
+	vial
+	via
   ];
 
   environment.variables = {
@@ -174,4 +181,16 @@
   services.blueman.enable = true;
 
   #hardware.pulseaudio.enable = true;
+
+  # udev rules (for Vial)
+  services.udev.extraRules = ''
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="4653", ATTRS{idProduct}=="0001", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+  '';
+  services.udev.packages = with pkgs; [
+    qmk
+    qmk-udev-rules
+    qmk_hid
+    via
+    vial
+  ];
 }
