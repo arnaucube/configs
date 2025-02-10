@@ -180,6 +180,10 @@ for_window [window_role="alert"] floating enable
 exec feh --bg-fill ~/Sync-tablet/wallpapers/geometry02_croped1920x1080.png 
 exec xmodmap .Xmodmap
 
+# shortcut to switch regular/bold font in alacritty configuration
+bindsym $mod+Control+b exec sed -i 's/\"Regular\"#tag_for_shortcut/\"Bold\"#tag_for_shortcut/g' ~/.config/alacritty/alacritty.toml
+bindsym $mod+Control+Shift+b exec sed -i 's/\"Bold\"#tag_for_shortcut/\"Regular\"#tag_for_shortcut/g' ~/.config/alacritty/alacritty.toml
+
 # move current workspace to another display
 bindsym $mod+Control+k move workspace to output HDMI-1
 # bindsym $mod+Control+k move workspace to output DP-1

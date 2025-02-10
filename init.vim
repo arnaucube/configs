@@ -98,6 +98,7 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " focus mode
 Plug 'junegunn/goyo.vim'
+Plug 'szw/vim-maximizer' " use `CTRL+w; m` to maximize panel
 
 " vimwiki
 Plug 'vimwiki/vimwiki'
@@ -109,8 +110,8 @@ Plug 'tomasr/molokai'
 Plug 'srcery-colors/srcery-vim'
 Plug 'rakr/vim-one'
 Plug 'morhetz/gruvbox'
-
-Plug 'szw/vim-maximizer'
+Plug 'noahfrederick/vim-hemisu'
+Plug 'JaySandhu/xcode-vim'
 
 call plug#end()
 

@@ -100,6 +100,7 @@
 	feh
 	kolourpaint
 	calibre
+	tauon
 
 	# browsers
 	firefox

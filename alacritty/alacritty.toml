@@ -15,7 +15,7 @@ style = "MediumItalic"
 
 [font.normal]
 family = "terminus"
-style = "Regular"
+style = "Regular"#tag_for_shortcut
 
 [[keyboard.bindings]]
 action = "SpawnNewInstance"

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#
+
+
+DEVICE_PATH=$1
+
+if [ -z $DEVICE_PATH ] ; then
+	echo "missing 1st argument (DEVICE_PATH), ie. where to download the files"
+	exit 1
+fi
+
+rsync -avz --progress --ignore-existing tele-rpi5:/mnt/usb/audio/ $DEVICE_PATH
