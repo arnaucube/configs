@@ -66,6 +66,9 @@ Plug 'iden3/vim-circom-syntax'
 " LaTeX support. It needs latexmk & zathura
 Plug 'lervag/vimtex'
 
+" Coq/Rocq
+Plug 'whonore/Coqtail'
+
 " deoplete
 Plug 'Shougo/deoplete.nvim'
 let g:deoplete#enable_at_startup = 1
@@ -269,8 +272,8 @@ let g:gruvbox_contrast_dark = 'hard'
 let g:gruvbox_contrast_light = 'hard'
 let g:srcery_italic = 1
 
-set colorcolumn=100
-" set textwidth=80
+set colorcolumn=80
+set textwidth=80
 
 set background=dark 
 

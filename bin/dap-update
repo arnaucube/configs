@@ -10,3 +10,12 @@ if [ -z $DEVICE_PATH ] ; then
 fi
 
 rsync -avz --progress --ignore-existing tele-rpi5:/mnt/usb/audio/ $DEVICE_PATH
+
+# update from sd-card to the server:
+# rsync -avz --progress --ignore-existing ./ tele-rpi5:/mnt/usb/audio/
+#
+# DOWNLOAD raspberry to sdcard:
+# rsync -az -P --ignore-existing --exclude={'switch','switch_BACKUP','zips'} tele-rpi5:/mnt/usb/games/roms/ ./
+#
+# UPLOAD roms from sd-card to raspberrypi (in the `roms` dir):
+# rsync -az -P --ignore-existing --exclude={'switch','switch_BACKUP','zips'} ./ tele-rpi5:/mnt/usb/games/roms/

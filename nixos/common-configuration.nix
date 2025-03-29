@@ -99,6 +99,7 @@
 	vlc
 	feh
 	kolourpaint
+	gimp
 	calibre
 	tauon
 
@@ -130,6 +131,10 @@
 	wabt # wasm binary toolkit
 	wasmedge # to execute wasm binaries
 	sage
+	coq
+	coqPackages.mathcomp
+	coqPackages.coqide
+	opam # ocaml package manager, for coq packages
 	go
 	(python3.withPackages(ps: with ps; [
 		matplotlib numpy qmk
