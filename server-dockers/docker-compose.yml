@@ -1,0 +1,88 @@
+version: '3.8'
+#
+# More info: https://arnaucube.com/media-setup/
+#
+#
+# Usage
+# -----
+# - All commands from inside the same directory where this file is placed.
+# - Replace the `/mnt/usb` to your custom location, usually an external hard
+#   drive.
+#
+# Run:
+# > sudo docker compose up -d
+#
+# Stop:
+# > sudo docker compose stop
+#
+# Remove containers (since the volumes are mapped to local directories, they
+# will persist):
+# > sudo docker compose down
+#
+# Port of each service:
+# - jellyfin: 8096
+# - emby: 8097
+# - wallabag: 8098
+# - slskd: 8099
+# - qbittorrent: 8080
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    ports:
+      - "8096:8096"
+    volumes:
+      - /mnt/usb/configurations/jellyfin:/config
+      - /mnt/usb:/media
+    restart: unless-stopped
+
+  emby:
+    image: emby/embyserver_arm64v8
+    container_name: emby
+    ports:
+      - "8097:8096"
+    volumes:
+      - /mnt/usb/configurations/emby:/config
+      - /mnt/usb:/media
+    restart: unless-stopped
+
+  wallabag:
+    image: wallabag/wallabag
+    container_name: wallabag
+    ports:
+      - "8098:80"
+    volumes:
+      - /mnt/usb/configurations/wallabag/data:/var/www/wallabag/data
+      - /mnt/usb/configurations/wallabag/images:/var/www/wallabag/web/assets/images
+    environment:
+      - SYMFONY__ENV__DOMAIN_NAME=http://192.168.1.155:8098
+    restart: unless-stopped
+
+  # slskd:
+  #   image: slskd/slskd
+  #   container_name: slskd
+  #   ports:
+  #     - "8099:5030"
+  #     - "50300:50300"
+  #   volumes:
+  #     - /mnt/usb/configurations/slkskd:/app
+  #     - /mnt/usb/audio/slskd-downloads:/downloads
+  #   environment:
+  #     - SLSKD_REMOTE_CONFIGURATION=true
+  #   restart: unless-stopped
+
+  qbittorrent-nox:
+    image: qbittorrentofficial/qbittorrent-nox:latest
+    container_name: qbittorrent-nox
+    ports:
+      - "8080:8080"
+      - "6881:6881/tcp"  # Torrent listening port
+      - "6881:6881/udp"
+    volumes:
+      - /mnt/usb/configurations/qbittorrent:/config
+      - /mnt/usb:/downloads
+    environment:
+      - QBT_LEGAL_NOTICE=confirm
+      - WEBUI_PORT=8080
+    restart: unless-stopped
