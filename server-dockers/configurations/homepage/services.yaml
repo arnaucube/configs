@@ -1,0 +1,46 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/services/
+
+- Media:
+    - Jellyfin:
+        icon: jellyfin.png
+        href: http://192.168.1.155:8096
+        description: Jellyfin Media Server
+    - Emby:
+        icon: emby.png
+        href: http://192.168.1.155:8097
+        description: Emby Media Server
+    - qBittorrent:
+        icon: qbittorrent.png
+        href: http://192.168.1.155:8080
+        description: qBittorrent Web UI
+        widget:
+          type: qbittorrent
+          url: http://192.168.1.155:8080
+          username: admin
+          password: YOUR_PASSWORD_HERE
+          enableLeechProgress: true # optional, defaults to false
+    - metube:
+        icon: metube.png
+        href: http://192.168.1.155:8100
+        description: download youtube music & videos
+
+- Altres:
+    - grafana:
+        icon: grafana.png
+        href: http://192.168.1.155:3000/d/rYdddlPWk/node-exporter-full
+        description: grafana dashboard
+    - Wallabag:
+        icon: wallabag.png
+        href: http://192.168.1.155:8098
+        description: Wallabag Read It Later
+    - pi-hole:
+        icon: pi-hole.png
+        href: https://192.168.1.155/admin/
+        description: pi-hole admin panel
+        widget:
+          type: pihole
+          url: http://192.168.1.155
+          version: 6 # required if running v6 or higher, defaults to 5
+          key: YOUR_PASSWORD_HERE

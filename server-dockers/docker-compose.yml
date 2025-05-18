@@ -19,12 +19,15 @@ version: '3.8'
 # will persist):
 # > sudo docker compose down
 #
+#
 # Port of each service:
 # - jellyfin: 8096
 # - emby: 8097
 # - wallabag: 8098
 # - slskd: 8099
+# - metube: 8100
 # - qbittorrent: 8080
+# - homepage: 3000
 
 services:
   jellyfin:
@@ -72,6 +75,15 @@ services:
   #     - SLSKD_REMOTE_CONFIGURATION=true
   #   restart: unless-stopped
 
+  metube:
+    image: ghcr.io/alexta69/metube
+    container_name: metube
+    ports:
+      - "8100:8081"
+    volumes:
+      - /mnt/usb/audio/from-youtube:/downloads
+    restart: unless-stopped
+
   qbittorrent-nox:
     image: qbittorrentofficial/qbittorrent-nox:latest
     container_name: qbittorrent-nox
@@ -85,4 +97,17 @@ services:
     environment:
       - QBT_LEGAL_NOTICE=confirm
       - WEBUI_PORT=8080
+    restart: unless-stopped
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: 192.168.1.155:8000 # required, may need port. See gethomepage.dev/installation/#homepage_allowed_hosts
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+    ports:
+      - 8000:3000
+    volumes:
+      - /mnt/usb/configurations/homepage:/app/config
     restart: unless-stopped
