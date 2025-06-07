@@ -47,9 +47,9 @@ cat .bashrc >> ~/.bashrc
 source .bashrc
 
 # # go
-# echo "installing go 1.21.6"
-# wget https://golang.org/dl/go1.21.6.linux-amd64.tar.gz
-# tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz
+# echo "installing go 1.24.3"
+# wget https://golang.org/dl/go1.24.3.linux-amd64.tar.gz
+# tar -C /usr/local -xzf go1.24.3.linux-amd64.tar.gz
 # 
 # # nodejs
 # echo "installing nodejs v16"
@@ -59,10 +59,10 @@ source .bashrc
 # 
 # echo "installing npm http-server"
 # npm install -g http-server
-# 
-# echo "installing fzf fuzzy finder"
-# git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-# ~/.fzf/install
+
+echo "installing fzf fuzzy finder"
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+yes | ~/.fzf/install
 
 echo "instaling ripgrep"
 # curl -LO https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep_13.0.0_amd64.deb
