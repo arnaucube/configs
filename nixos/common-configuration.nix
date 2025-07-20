@@ -98,7 +98,7 @@
 	mpv
 	vlc
 	feh
-	kolourpaint
+	#kolourpaint
 	gimp
 	calibre
 	tauon
@@ -133,11 +133,13 @@
 	sage
 	coq
 	coqPackages.mathcomp
-	coqPackages.coqide
+	#coqPackages.coqide
 	opam # ocaml package manager, for coq packages
 	go
 	(python3.withPackages(ps: with ps; [
 		matplotlib numpy qmk
+		meshtastic esptool # meshtastic related
+		unicodeit
 	]))
 	pipx
 	nodejs
@@ -146,6 +148,9 @@
 	qmk
 	vial
 	via
+
+	freecad
+	orca-slicer
   ];
 
   environment.variables = {
@@ -187,6 +192,9 @@
   services.blueman.enable = true;
 
   #hardware.pulseaudio.enable = true;
+  services.pulseaudio.enable = true;
+  services.pipewire.enable=false;
+  services.pipewire.pulse.enable=false;
 
   # udev rules (for Vial)
   services.udev.extraRules = ''

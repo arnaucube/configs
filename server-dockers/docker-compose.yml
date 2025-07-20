@@ -1,4 +1,5 @@
-version: '3.8'
+#version: '3.8'
+
 #
 # More info: https://arnaucube.com/media-setup/
 #
@@ -8,6 +9,9 @@ version: '3.8'
 # - All commands from inside the same directory where this file is placed.
 # - Replace the `/mnt/usb` to your custom location, usually an external hard
 #   drive.
+#
+# Before running: mount the external hard drive!!
+# > sudo mount /dev/sda /mnt/usb
 #
 # Run:
 # > sudo docker compose up -d
@@ -111,3 +115,50 @@ services:
     volumes:
       - /mnt/usb/configurations/homepage:/app/config
     restart: unless-stopped
+
+  # metrics related:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - monitoring
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local

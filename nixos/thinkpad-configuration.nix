@@ -44,7 +44,7 @@
   # gvfs needed for Thunar to detect external disks
   services.gvfs.enable = true;
 
-  hardware.pulseaudio.enable = true;
+  #hardware.pulseaudio.enable = true;
 
   # allow AppImage programs
   programs.appimage.binfmt = true;

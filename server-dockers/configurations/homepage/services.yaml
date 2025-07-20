@@ -27,10 +27,14 @@
         description: download youtube music & videos
 
 - Altres:
-    - grafana:
+    - raspberry grafana:
         icon: grafana.png
         href: http://192.168.1.155:3000/d/rYdddlPWk/node-exporter-full
-        description: grafana dashboard
+        description: raspberry grafana dashboard
+    - Galdric grafana:
+        icon: grafana.png
+        href: http://192.168.1.156:3000/d/rYdddlPWk/node-exporter-full
+        description: Galdric grafana dashboard
     - Wallabag:
         icon: wallabag.png
         href: http://192.168.1.155:8098
@@ -43,4 +47,4 @@
           type: pihole
           url: http://192.168.1.155
           version: 6 # required if running v6 or higher, defaults to 5
-          key: YOUR_PASSWORD_HERE
+          key: YOUR_PASSWORD_HERE # password
