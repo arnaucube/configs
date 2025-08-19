@@ -31,6 +31,7 @@ call plug#end()
 
 
 " copy&paste from system clipboard
+set clipboard=unnamedplus
 vnoremap  <leader>y  "+y
 vnoremap  <leader>p  "+p
 

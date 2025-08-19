@@ -3,7 +3,7 @@ background = "#000000"
 foreground = "#ffffff"
 
 [font]
-size = 9.0
+size = 14.0
 
 [font.bold]
 family = "terminus"

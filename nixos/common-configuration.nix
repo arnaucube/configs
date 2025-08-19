@@ -21,9 +21,9 @@
     LC_TIME = "es_ES.UTF-8";
   };
 
-  services.displayManager = {
-      defaultSession = "none+i3";
-  };
+#  services.displayManager = {
+#      defaultSession = "none+i3";
+#  };
   services.xserver = {
     xkb = { # Configure keymap in X11
       layout = "us";
@@ -31,20 +31,40 @@
     };
 
     enable=true;
-    #displayManager = {
-    #  defaultSession = "none+i3";
-    #};
-    windowManager.i3 = {
-      enable=true;
-      extraPackages = with pkgs; [
-        dmenu
-        i3status
-        i3lock
-      ];
-    };
+#    #displayManager = {
+#    #  defaultSession = "none+i3";
+#    #};
+#    windowManager.i3 = {
+#      enable=true;
+#      extraPackages = with pkgs; [
+#        dmenu
+#        i3status
+#        i3lock
+#      ];
+#    };
   };
+  # --- sway wm config:
+  services.xserver.displayManager.gdm.enable=true;
+  services.xserver.displayManager.gdm.wayland=false;
+  #services.xserver.displayManager.plasma5.enable=true;
+  # Enable the gnome-keyring secrets vault. 
+  # Will be exposed through DBus to programs willing to store secrets.
+  services.gnome.gnome-keyring.enable = true;
+  # enable sway wm
+  programs.sway = {
+    enable = true;
+    wrapperFeatures.gtk = true;
+  };
+  security.polkit.enable = true;
+  # --- end of sway config.
 
   environment.systemPackages = with pkgs; [
+	# sway wm utilities
+	grim # screenshot functionality
+	slurp # screenshot functionality
+	wl-clipboard # wl-copy and wl-paste for copy/paste from stdin / stdout
+	mako # notification system developed by swaywm maintainer
+
 	# utilities
  	wget
 	tmux
@@ -65,6 +85,7 @@
 	xfce.xfce4-screenshooter
 	pulseaudio
 	usbutils
+	time
 
 	# code editors
   	vim
@@ -124,8 +145,9 @@
 	#gcc
 	clang
 	clang-tools
-	pkg-config
+
 	openssl.dev
+
 	stdenv
 	rustup
 	wabt # wasm binary toolkit
@@ -137,12 +159,14 @@
 	opam # ocaml package manager, for coq packages
 	go
 	(python3.withPackages(ps: with ps; [
-		matplotlib numpy qmk
+		matplotlib numpy
+		qmk
 		meshtastic esptool # meshtastic related
 		unicodeit
 	]))
 	pipx
 	nodejs
+	pnpm
 
 	# other
 	qmk

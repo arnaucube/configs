@@ -38,7 +38,7 @@ set sidescrolloff=5           " keep at least 5 lines left/right
 " set textwidth=80
 
 " toggle for paste mode
-set pastetoggle=<F3>
+"set pastetoggle=<F3> " NOTE: not supported in latest release of neovim (yes in vim)
 
 " set ignorecase  " do case insensitive search 
 set incsearch   " show incremental search results as you type
