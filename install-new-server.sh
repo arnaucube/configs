@@ -74,13 +74,14 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 # needed for later rust packages installations
 apt install build-essential -y
+apt install pkg-config libssl-dev -y
 
 # btop
-wget https://github.com/aristocratos/btop/releases/download/v1.3.0/btop-x86_64-linux-musl.tbz
-tar -xjf btop-x86_64-linux-musl.tbz
-cd btop
-bash install.sh
-cd ..
+# wget https://github.com/aristocratos/btop/releases/download/v1.3.0/btop-x86_64-linux-musl.tbz
+# tar -xjf btop-x86_64-linux-musl.tbz
+# cd btop
+# bash install.sh
+# cd ..
 
 # # assuming that Rust is installed
 # echo "installing delta (gitdiff tool)"

@@ -18,7 +18,7 @@
     LC_NUMERIC = "es_ES.UTF-8";
     LC_PAPER = "es_ES.UTF-8";
     LC_TELEPHONE = "es_ES.UTF-8";
-    LC_TIME = "es_ES.UTF-8";
+    LC_TIME = "en_US.UTF-8";
   };
 
 #  services.displayManager = {
@@ -45,7 +45,8 @@
   };
   # --- sway wm config:
   services.xserver.displayManager.gdm.enable=true;
-  services.xserver.displayManager.gdm.wayland=false;
+  #services.displayManager.sessionPackages = [ pkgs.sway ];
+  #services.xserver.displayManager.gdm.wayland=false;
   #services.xserver.displayManager.plasma5.enable=true;
   # Enable the gnome-keyring secrets vault. 
   # Will be exposed through DBus to programs willing to store secrets.
@@ -86,6 +87,10 @@
 	pulseaudio
 	usbutils
 	time
+	#impala # nmtui alternative
+	fastfetch
+	rpm
+	pdfgrep # to find strings across pdfs in directories
 
 	# code editors
   	vim
@@ -123,6 +128,9 @@
 	gimp
 	calibre
 	tauon
+	libsForQt5.kdenlive
+	libreoffice-qt6
+	ffmpeg
 
 	# browsers
 	firefox
@@ -142,11 +150,21 @@
 		;
 	})
 	gnumake
-	#gcc
+	gcc
 	clang
 	clang-tools
 
+	openssl
 	openssl.dev
+	glib       # GLib base library
+	#gio        # GIO library
+	gdk-pixbuf # GDK Pixbuf library
+	gtk3       # GTK3 including GDK, relevant for gdk-sys
+	atk        # Accessibility Toolkit
+	cairo      # 2D graphics library
+	pango      # Text layout and rendering
+	pkg-config # Needed for pkg-config to find .pc files
+	cmake
 
 	stdenv
 	rustup
@@ -163,6 +181,7 @@
 		qmk
 		meshtastic esptool # meshtastic related
 		unicodeit
+		setuptools
 	]))
 	pipx
 	nodejs
@@ -178,9 +197,20 @@
   ];
 
   environment.variables = {
- 	LIBCLANG_PATH = "${pkgs.llvmPackages_17.libclang.lib}/lib";
+	OPENSSL_DEV = "${pkgs.openssl.dev}";
+	OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
+	OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
 	PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
-	OPENSSL_DIR = "${pkgs.openssl.dev}";
+
+	OPENSSL_NO_VENDOR="1";
+	OPENSSL_STATIC="0";
+
+	# for screen sharing in sway
+	XDG_CURRENT_DESKTOP = "sway";
+	XDG_SESSION_TYPE="wayland";
+
+	WAYLAND_DISPLAY="wayland-1";
+	XDG_RUNTIME_DIR="/run/user/$(id -u)";
   };
 
   fonts.packages = with pkgs; [
@@ -207,18 +237,33 @@
   xdg.mime.defaultApplications = {
     "application/pdf" = "zathura";
   };
+  xdg.portal = {
+    enable = true;
+    wlr.enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-wlr ];
+  };
 
   # gvfs needed for Thunar to detect external disks
   services.gvfs.enable = true;
+
+  hardware.graphics.enable = true;
 
   # bluetooth related
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
   #hardware.pulseaudio.enable = true;
-  services.pulseaudio.enable = true;
-  services.pipewire.enable=false;
-  services.pipewire.pulse.enable=false;
+  #services.pulseaudio.enable = true;
+  #services.pipewire.pulse.enable=false;
+  #services.pipewire.enable=false;
+  services.pipewire = {
+    enable = true;          # Enable PipeWire service
+    alsa.enable = true;     # Enable ALSA support (audio hardware)
+    alsa.support32Bit = true; # Support 32-bit apps on 64-bit systems
+    pulse.enable = true;    # Enable PipeWire PulseAudio replacement
+    wireplumber.enable = true; # Enable WirePlumber session manager (recommended)
+    jack.enable = true;     # Enable JACK support if needed
+  };
 
   # udev rules (for Vial)
   services.udev.extraRules = ''
@@ -231,4 +276,6 @@
     via
     vial
   ];
+
+  nix.settings.extra-experimental-features = [ "nix-command" "flakes" ];
 }
