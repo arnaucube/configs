@@ -12,8 +12,13 @@
 - resources:
     cpu: true
     memory: true
+    cputemp: true
     disk: /
     uptime: true
+- resources:
+    label: "hard drive"
+    expanded: true
+    disk: /app/config
 
 - search:
     provider: duckduckgo

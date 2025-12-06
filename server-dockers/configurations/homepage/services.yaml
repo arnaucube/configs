@@ -39,12 +39,11 @@
         icon: wallabag.png
         href: http://192.168.1.155:8098
         description: Wallabag Read It Later
-    - pi-hole:
-        icon: pi-hole.png
-        href: https://192.168.1.155/admin/
-        description: pi-hole admin panel
-        widget:
-          type: pihole
-          url: http://192.168.1.155
-          version: 6 # required if running v6 or higher, defaults to 5
-          key: YOUR_PASSWORD_HERE # password
+    - HomeAssistant:
+        icon: home-assistant.png
+        href: http://192.168.1.148:8123
+        description: Open Home Assistant page.
+#    - Vosk:
+#        icon: vosk.png
+#        href: http://192.168.1.155:8101
+#        description: voice to text

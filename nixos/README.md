@@ -1,5 +1,22 @@
 After nixos installation and config files in place, run the `../install-new-desktop.sh` script to put in place all the config files (vim,nvim,tmux,i3,etc)
 
+Go back to a previous generation:
+```
+# list stored generations
+sudo nixos-rebuild list-generations
+
+# go to generation number 42
+sudo nix-env --switch-generation 42 -p /nix/var/nix/profiles/system
+
+# use it
+sudo /nix/var/nix/profiles/system/bin/switch-to-configuration switch
+
+# go back to the latest generation (suppose is 84)
+sudo nix-env --switch-generation 82 -p /nix/var/nix/profiles/system
+
+# to quickly go back just one step:
+sudo nixos-rebuild rollback
+```
 
 From time to time run the following commands to remove stuff from old generations
 ```
