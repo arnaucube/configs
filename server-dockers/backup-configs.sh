@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 
 SERVER=$1
+PASSW=$2
+NEW_PASSW="YOURPASSWORDHERE"
 
-if [ -z $SERVER ] ; then
-	echo "missing 1st argument (SERVER)"
-	exit 1
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 SERVER_NAME PASSW"
+  exit 1
 fi
 
+rsync -avz --progress --exclude={'*.log','emby','jellyfin','qbittorrent','slskd','wallabag','prowlarr','sonarr','radarr','bazarr'} $SERVER:~/server-dockers/docker-compose.yml $SERVER:/mnt/usb/configurations ./
 
-rsync -avz --progress --exclude={'*.log','emby','jellyfin','qbittorrent','slskd','wallabag'} $SERVER:~/server-dockers/docker-compose.yml $SERVER:/mnt/usb/configurations ./
+# replace PASSW by NEW_PASSW (also in subdirs)
+find . -type f -exec \
+  sed -i "s/${PASSW//\//\\/}/${NEW_PASSW//\//\\/}/g" {} +

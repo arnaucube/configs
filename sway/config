@@ -30,7 +30,8 @@ output * bg ~/Sync-tablet/wallpapers/geometry02_croped1920x1080.png fill
 
 # home setup:
 output HDMI-A-1 resolution 3840x2160 position 1920 0
-output eDP-1 resolution 1920x1200 position 0 0
+# output eDP-1 resolution 1920x1200 position 0 0 transform 90
+output DSI-1 resolution 1920x1200 position 0 0 transform 90
 
 # portable external monitor setup:
 # output DP-1 resolution 3840x2160 position 1920 0

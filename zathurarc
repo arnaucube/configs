@@ -1,3 +1,5 @@
 " this file goes at ~/.config/zathura/zathurarc
 
 map <C-O> exec "zathura $FILE"
+
+set selection-clipboard clipboard

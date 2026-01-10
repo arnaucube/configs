@@ -12,6 +12,13 @@ background:
   opacity: 100 # 0-100
 
 providers:
-  openweathermap: openweathermapapikey
-  weatherapi: weatherapiapikey
+  openweathermap: OPENWEATHERMAPAPIKEY
+  weatherapi: WEATHERAPIAPIKEY
 
+layout:
+  LeftCol:
+    header: false
+  CentralCol:
+    header: false
+  RightCol:
+    header: false

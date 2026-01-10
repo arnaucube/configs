@@ -84,6 +84,7 @@
 	gnutar
 	xorg.xmodmap # keyboard remapping
 	xfce.xfce4-screenshooter
+	flameshot
 	pulseaudio
 	usbutils
 	time

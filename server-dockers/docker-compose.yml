@@ -30,6 +30,10 @@
 # - wallabag: 8098
 # - slskd: 8099
 # - metube: 8100
+# - sonarr: 8101
+# - prowlarr: 8102
+# - bazarr: 8103
+# - radarr: 8104
 # - qbittorrent: 8080
 # - homepage: 8000
 # - grafana: 3000
@@ -89,6 +93,64 @@ services:
       - /mnt/usb/audio/from-youtube:/downloads
     restart: unless-stopped
 
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Amsterdam
+    volumes:
+      - /mnt/usb/configurations/sonarr:/config
+      - /mnt/usb/torrent-downloads:/downloads
+      - /mnt/usb/shows:/data/shows
+    ports:
+      - 8101:8989
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Amsterdam
+    volumes:
+      - /mnt/usb/configurations/radarr:/config
+      - /mnt/usb/torrent-downloads:/downloads
+      - /mnt/usb/movies:/movies
+    ports:
+      - 8104:7878
+    restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Amsterdam
+    volumes:
+      - /mnt/usb/configurations/bazarr:/config
+      - /mnt/usb/shows:/data/shows
+      - /mnt/usb/movies:/movies
+    ports:
+      - 8103:6767
+    restart: unless-stopped
+
+  prowlarr:
+    container_name: prowlarr
+    image: ghcr.io/hotio/prowlarr
+    ports:
+      - "8102:9696"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=Europe/Amsterdam
+    volumes:
+      - /mnt/usb/configurations/prowlarr:/config
+
   qbittorrent-nox:
     image: qbittorrentofficial/qbittorrent-nox:latest
     container_name: qbittorrent-nox
@@ -98,7 +160,7 @@ services:
       - "6881:6881/udp"
     volumes:
       - /mnt/usb/configurations/qbittorrent:/config
-      - /mnt/usb:/downloads
+      - /mnt/usb/torrent-downloads:/downloads
     environment:
       - QBT_LEGAL_NOTICE=confirm
       - WEBUI_PORT=8080
@@ -147,7 +209,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=YOUR_PASSWORD_HERE
+      - GF_SECURITY_ADMIN_PASSWORD=YOURPASSWORDHERE
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
@@ -155,6 +217,11 @@ services:
     depends_on:
       - prometheus
     restart: unless-stopped
+
+  # NOTE: better run homeassistant alone in the rpi as OS (not container),
+  #       which has support for 'add-ons'.
+  #       More info: https://www.home-assistant.io/installation/#about-installation-types
+
 
 networks:
   monitoring:

@@ -2,48 +2,80 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services/
 
-- Media:
-    - Jellyfin:
-        icon: jellyfin.png
-        href: http://192.168.1.155:8096
-        description: Jellyfin Media Server
-    - Emby:
-        icon: emby.png
-        href: http://192.168.1.155:8097
-        description: Emby Media Server
-    - qBittorrent:
-        icon: qbittorrent.png
-        href: http://192.168.1.155:8080
-        description: qBittorrent Web UI
-        widget:
-          type: qbittorrent
-          url: http://192.168.1.155:8080
-          username: admin
-          password: YOUR_PASSWORD_HERE
-          enableLeechProgress: true # optional, defaults to false
-    - metube:
-        icon: metube.png
-        href: http://192.168.1.155:8100
-        description: download youtube music & videos
+- LeftCol:
+  - Media:
+      - Jellyfin:
+          icon: jellyfin.png
+          href: http://192.168.1.155:8096
+          description: Jellyfin Media Server
+      - Emby:
+          icon: emby.png
+          href: http://192.168.1.155:8097
+          description: Emby Media Server
+  - Descarregues a ma:
+      - qBittorrent:
+          icon: qbittorrent.png
+          href: http://192.168.1.155:8080
+          description: qBittorrent Web UI
+          widget:
+            type: qbittorrent
+            url: http://192.168.1.155:8080
+            username: admin
+            password: YOURPASSWORDHERE
+            enableLeechProgress: true # optional, defaults to false
+      - slskd:
+          icon: slskd.png
+          href: http://192.168.1.155:8099
+          description: SoulSeek client to download music
+      - metube:
+          icon: metube.png
+          href: http://192.168.1.155:8100
+          description: download youtube music & videos
 
-- Altres:
-    - raspberry grafana:
-        icon: grafana.png
-        href: http://192.168.1.155:3000/d/rYdddlPWk/node-exporter-full
-        description: raspberry grafana dashboard
-    - Galdric grafana:
-        icon: grafana.png
-        href: http://192.168.1.156:3000/d/rYdddlPWk/node-exporter-full
-        description: Galdric grafana dashboard
-    - Wallabag:
-        icon: wallabag.png
-        href: http://192.168.1.155:8098
-        description: Wallabag Read It Later
-    - HomeAssistant:
-        icon: home-assistant.png
-        href: http://192.168.1.148:8123
-        description: Open Home Assistant page.
-#    - Vosk:
-#        icon: vosk.png
-#        href: http://192.168.1.155:8101
-#        description: voice to text
+- CentralCol:
+  - DescARRegues:
+      - sonarr:
+          icon: sonarr.png
+          href: http://192.168.1.155:8101
+          description: Automating download of shows
+          widget:
+            type: sonarr
+            url: http://192.168.1.155:8101
+            key: API_KEY_HERE
+            enableQueue: true
+      - radarr:
+          icon: radarr.png
+          href: http://192.168.1.155:8104
+          description: Automating download of movies
+          widget:
+            type: radarr
+            url: http://192.168.1.155:8104
+            key: API_KEY_HERE
+            enableQueue: true
+      - bazarr:
+          icon: bazarr.png
+          href: http://192.168.1.155:8103
+          description: Manage & download subtitles
+      - prowlarr:
+          icon: prowlarr.png
+          href: http://192.168.1.155:8102
+          description: API Support for torrent trackers 
+
+- RightCol:
+  - Altres:
+      - beelink grafana:
+          icon: grafana.png
+          href: http://192.168.1.155:3000/d/rYdddlPWk/node-exporter-full
+          description: beelink grafana dashboard
+      - Galdric grafana:
+          icon: grafana.png
+          href: http://192.168.1.156:3000/d/rYdddlPWk/node-exporter-full
+          description: Galdric grafana dashboard
+      - Wallabag:
+          icon: wallabag.png
+          href: http://192.168.1.155:8098
+          description: Wallabag Read It Later
+      - HomeAssistant:
+          icon: home-assistant.png
+          href: http://192.168.1.148:8123
+          description: Open Home Assistant page.
