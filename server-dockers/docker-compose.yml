@@ -26,7 +26,6 @@
 #
 # Port of each service:
 # - jellyfin: 8096
-# - emby: 8097
 # - wallabag: 8098
 # - slskd: 8099
 # - metube: 8100
@@ -34,6 +33,7 @@
 # - prowlarr: 8102
 # - bazarr: 8103
 # - radarr: 8104
+# - qui: 8105
 # - qbittorrent: 8080
 # - homepage: 8000
 # - grafana: 3000
@@ -46,16 +46,6 @@ services:
       - "8096:8096"
     volumes:
       - /mnt/usb/configurations/jellyfin:/config
-      - /mnt/usb:/media
-    restart: unless-stopped
-
-  emby:
-    image: emby/embyserver # in rpi: emby/embyserver_arm64v8
-    container_name: emby
-    ports:
-      - "8097:8096"
-    volumes:
-      - /mnt/usb/configurations/emby:/config
       - /mnt/usb:/media
     restart: unless-stopped
 
@@ -166,6 +156,15 @@ services:
       - WEBUI_PORT=8080
     restart: unless-stopped
 
+  qui:
+    image: ghcr.io/autobrr/qui:latest
+    container_name: qui
+    restart: unless-stopped
+    ports:
+      - "8105:7476"
+    volumes:
+      - ./qui:/config
+
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
@@ -221,7 +220,6 @@ services:
   # NOTE: better run homeassistant alone in the rpi as OS (not container),
   #       which has support for 'add-ons'.
   #       More info: https://www.home-assistant.io/installation/#about-installation-types
-
 
 networks:
   monitoring:

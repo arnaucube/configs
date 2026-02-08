@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# NOTE: needs mkvtoolnix installed, ie. `apt install mkvtoolnix`.
+
+set -e
+
+OUT="$PWD"
+echo "processing current directory: $OUT"
+
+for dir in */ ; do
+  [ -d "$dir" ] || continue
+  echo "processing $dir"
+
+  cd "$dir"
+
+  # prefer .rar if present
+  rarfile=$(ls *.rar 2>/dev/null | head -n1)
+  if [ -z "$rarfile" ]; then
+    rarfile=$(ls *.r00 2>/dev/null | head -n1)
+  fi
+
+  if [ -z "$rarfile" ]; then
+    echo "  no .rar/.r00 in $dir, skipping"
+    cd ..
+    continue
+  fi
+
+  unrar x -o+ "$rarfile" . || { echo "  extraction failed in $dir"; cd ..; continue; }
+
+  # find first video file
+  video=$(find . -maxdepth 1 -type f \
+    \( -iname '*.mkv' -o -iname '*.mp4' -o -iname '*.avi' -o -iname '*.m2ts' \) \
+    ! -iname '*sample*' | head -n1)
+
+  if [ -z "$video" ]; then
+    echo "  no video found after extraction in $dir"
+    cd ..
+    continue
+  fi
+
+  base=$(basename "$dir" /)
+  out="$OUT/${base}.mkv"
+
+  echo "  muxing '$video' -> '$out'"
+  mkvmerge -o "$out" "$video"
+
+  cd ..
+done
+
