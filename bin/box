@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+#
+# Launch LXC containers to work in there.
+
+# Needs: sudo snap install lxd
+# initialize lxd: sudo lxd init --auto
+
+# NOTE: in case the container does not have internet:
+# 1)
+# sudo sysctl -w net.ipv4.ip_forward=1
+#
+# 2)
+# # Force iptables to ACCEPT traffic from the LXD bridge 
+# # Docker sets the global policy to DROP; we must explicitly allow lxdbr0
+# sudo iptables -I FORWARD -i lxdbr0 -j ACCEPT
+# sudo iptables -I FORWARD -o lxdbr0 -j ACCEPT
+#
+# 3)
+# # allow LXD bridge through firewall:
+# sudo ufw allow in on lxdbr0
+# sudo ufw route allow in on lxdbr0
+# sudo ufw route allow out on lxdbr0
+#
+# Note: when turning off and on the host machine, might need to set the iptables
+# again: step 3).
+
+
+set -e
+
+if [ -z "$1" ]; then
+    echo "Error: no container name provided."
+    echo "Usage: ./box.sh <container_name>"
+    exit 1
+fi
+
+CONTAINER_NAME="$1"
+HOST_SHARE_DIR="/home/$USER/container_data/$CONTAINER_NAME"
+CONTAINER_SHARE_DIR="/mnt/shared"
+IMAGE="ubuntu:22.04"
+
+PROFILE_NAME=${2:-"default"} # if $2 is empty, use "default"
+PROFILES_FILE="$HOME/bin/box_profiles.sh"
+
+# EXPOSE_PORTS="7000 7001 7002 7003 7004 7005 7006 7007 7008 7009 7010"
+EXPOSE_PORTS=""
+
+
+if [ -z "$CONTAINER_NAME" ]; then
+    echo "error: no container name provided."
+    echo "Usage: ./box.sh <container_name> [profile_name]"
+    exit 1
+fi
+
+if [ ! -f "$PROFILES_FILE" ]; then
+    echo "error: $PROFILES_FILE not found."
+    exit 1
+fi
+
+source "$PROFILES_FILE"
+
+if ! declare -f "profile_$PROFILE_NAME" > /dev/null; then
+    echo "error: profile '$PROFILE_NAME' not found in $PROFILES_FILE."
+    echo "Available profiles are:"
+    grep -oP '(?<=profile_).*(?=\(\))' "$PROFILES_FILE"
+    exit 1
+fi
+
+echo "profile selected: [$PROFILE_NAME]"
+echo "software to install: $SOFTWARE_LIST"
+
+mkdir -p "$HOST_SHARE_DIR"
+
+echo "launch LXD container: $CONTAINER_NAME..."
+# security.nesting=true allows Docker to run inside this container
+lxc launch "$IMAGE" "$CONTAINER_NAME" -c security.nesting=true
+
+sleep 2 # wait for filesystem
+
+echo "set dns"
+HOST_UID=$(id -u)
+# map Host User to Container Root
+lxc config set "$CONTAINER_NAME" raw.idmap "both $HOST_UID 0"
+# set dns to bypass host dns
+lxc exec "$CONTAINER_NAME" -- rm -f /etc/resolv.conf
+lxc exec "$CONTAINER_NAME" -- bash -c "echo 'nameserver 8.8.8.8' | tee /etc/resolv.conf"
+
+echo "restart container, sleep 2s"
+lxc restart "$CONTAINER_NAME"
+sleep 2
+
+echo "configure shared directory (between container & host)"
+lxc config device add "$CONTAINER_NAME" project_storage disk \
+    source="$HOST_SHARE_DIR" \
+    path="$CONTAINER_SHARE_DIR"
+
+echo "configure port forwarding"
+for PORT in $EXPOSE_PORTS; do
+    lxc config device add "$CONTAINER_NAME" "proxy${PORT}" proxy \
+        listen=tcp:0.0.0.0:${PORT} \
+        connect=tcp:127.0.0.1:${PORT}
+done
+
+echo "check internet"
+if ! lxc exec "$CONTAINER_NAME" -- ping -c 1 8.8.8.8 > /dev/null; then
+    echo "error: no internet access inside the container."
+    echo "note: check out the 'NOTE' at the top of the script for instructions."
+    # remove container, since failed the launch
+    lxc stop $CONTAINER_NAME
+    lxc delete $CONTAINER_NAME
+    exit 1
+fi
+
+echo "apt update & apt install"
+lxc exec "$CONTAINER_NAME" -- bash -c "
+    $(cat "$PROFILES_FILE")
+
+    export DEBIAN_FRONTEND=noninteractive
+    export NEEDRESTART_MODE=a # 'a' for automatic restart
+
+    apt-get update && apt-get upgrade -y
+
+    if declare -f profile_$PROFILE_NAME > /dev/null; then
+        profile_$PROFILE_NAME
+    else
+        echo 'error: profile function $PROFILE_NAME not found.'
+        exit 1
+    fi
+"
+
+echo "setup complete"
+echo "----------------------------------------------------"
+echo "Shared Directory (Host): $HOST_SHARE_DIR"
+echo "Shared Directory (Container): $CONTAINER_SHARE_DIR"
+echo "----------------------------------------------------"
+echo "To enter the container, run: lxc shell $CONTAINER_NAME"
+echo "To stop the container, run: lxc stop $CONTAINER_NAME"
+echo "To remove the container, run: lxc delete $CONTAINER_NAME"
