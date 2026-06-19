@@ -24,8 +24,11 @@
 # > sudo docker compose down
 #
 #
+# NOTE: the configurations is in the SSD disk, while the movies, shows, music are in the HHD
+#
 # Port of each service:
 # - jellyfin: 8096
+# - # emby: 8097
 # - wallabag: 8098
 # - slskd: 8099
 # - metube: 8100
@@ -34,6 +37,11 @@
 # - bazarr: 8103
 # - radarr: 8104
 # - qui: 8105
+# - jellystat: 8106
+# - lingarr: 8107
+# - libretranslate: 8108
+# - lidarr: 8109
+# - swiparr: 8110
 # - qbittorrent: 8080
 # - homepage: 8000
 # - grafana: 3000
@@ -45,9 +53,17 @@ services:
     ports:
       - "8096:8096"
     volumes:
-      - /mnt/usb/configurations/jellyfin:/config
+      - /home/beelink/configurations/jellyfin:/config
       - /mnt/usb:/media
     restart: unless-stopped
+    environment:
+      - JELLYFIN_PublishedServerUrl=https://jellyfin.myserver.com
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128 # hardware accelerated transcoding
+    group_add:
+      - "993" # obtained from `getent group render | cut -d: -f3`
+    networks:
+      - cloudflared_net
 
   wallabag:
     image: wallabag/wallabag
@@ -55,8 +71,8 @@ services:
     ports:
       - "8098:80"
     volumes:
-      - /mnt/usb/configurations/wallabag/data:/var/www/wallabag/data
-      - /mnt/usb/configurations/wallabag/images:/var/www/wallabag/web/assets/images
+      - /home/beelink/configurations/wallabag/data:/var/www/wallabag/data
+      - /home/beelink/configurations/wallabag/images:/var/www/wallabag/web/assets/images
     environment:
       - SYMFONY__ENV__DOMAIN_NAME=http://192.168.1.155:8098
     restart: unless-stopped
@@ -68,7 +84,7 @@ services:
       - "8099:5030"
       - "50300:50300"
     volumes:
-      - /mnt/usb/configurations/slskd:/app
+      - /home/beelink/configurations/slskd:/app
       - /mnt/usb/audio/slskd-downloads:/downloads # isolate it in a subdir, since slskd removes arbitrary files on that dir
     environment:
       - SLSKD_REMOTE_CONFIGURATION=true
@@ -91,7 +107,7 @@ services:
       - PGID=1000
       - TZ=Europe/Amsterdam
     volumes:
-      - /mnt/usb/configurations/sonarr:/config
+      - /home/beelink/configurations/sonarr:/config
       - /mnt/usb/torrent-downloads:/downloads
       - /mnt/usb/shows:/data/shows
     ports:
@@ -106,11 +122,26 @@ services:
       - PGID=1000
       - TZ=Europe/Amsterdam
     volumes:
-      - /mnt/usb/configurations/radarr:/config
+      - /home/beelink/configurations/radarr:/config
       - /mnt/usb/torrent-downloads:/downloads
       - /mnt/usb/movies:/movies
     ports:
       - 8104:7878
+    restart: unless-stopped
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Amsterdam
+    volumes:
+      - /home/beelink/configurations/lidarr/config:/config
+      - /mnt/usb/audio:/music
+      - /mnt/usb/torrent-downloads:/downloads
+    ports:
+      - 8109:8686
     restart: unless-stopped
 
   bazarr:
@@ -121,12 +152,77 @@ services:
       - PGID=1000
       - TZ=Europe/Amsterdam
     volumes:
-      - /mnt/usb/configurations/bazarr:/config
+      - /home/beelink/configurations/bazarr:/config
       - /mnt/usb/shows:/data/shows
       - /mnt/usb/movies:/movies
     ports:
       - 8103:6767
     restart: unless-stopped
+
+  lingarr:
+    image: ghcr.io/lingarr-translate/lingarr:latest # or lingarr/lingarr:latest
+    container_name: lingarr
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_URLS=http://+:9876
+      - DB_CONNECTION=mysql
+      - DB_HOST=lingarr-db
+      - DB_PORT=3306
+      - DB_DATABASE=lingarr
+      - DB_USERNAME=lingarr
+      - DB_PASSWORD=YOUR_DB_PASSW_HERE
+    ports:
+      - "8107:9876"
+    volumes:
+      - /mnt/usb/movies:/movies
+      - /mnt/usb/shows:/tv
+      - /home/beelink/configurations/lingarr:/app/config
+    # networks:
+    #   - lingarr
+    depends_on:
+      lingarr-db:
+        condition: service_healthy
+
+  lingarr-db:
+    image: mariadb:latest
+    container_name: lingarr-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=lingarr
+      - MYSQL_USER=lingarr
+      - MYSQL_PASSWORD=YOUR_DB_PASSW_HERE
+      - MYSQL_ROOT_PASSWORD=YOUR_DB_PASSW_HERE
+    volumes:
+      - /home/beelink/configurations/lingarr:/var/lib/mysql
+    # networks:
+    #   - lingarr
+    healthcheck:
+      test: "mariadb $$MYSQL_DATABASE -u$$MYSQL_USER -p$$MYSQL_PASSWORD -e 'SELECT 1;'"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  LibreTranslate:
+    container_name: LibreTranslate
+    image: libretranslate/libretranslate:latest
+    restart: unless-stopped
+    environment:
+      - LT_LOAD_ONLY=en,es,ca
+      - LT_WORKERS=2
+    user: "1000:1000"
+    ports:
+      - 8108:5000
+    volumes:
+      # NOTE: on first run, needs:
+      # rm -rf ./libretranslate
+      # mkdir ./libretranslate/.config
+      # sudo chown -R 1000:1000 ./libretranslate/.config
+      # sudo chmod -R 755 ./libretranslate/.config
+      #
+      - /home/beelink/configurations/libretranslate:/home/libretranslate/.local
+      - /home/beelink/configurations/libretranslate/.config:/home/libretranslate/.config
+    healthcheck:
+      test: ["CMD-SHELL", "./venv/bin/python scripts/healthcheck.py"]
 
   prowlarr:
     container_name: prowlarr
@@ -139,7 +235,8 @@ services:
       - UMASK=002
       - TZ=Europe/Amsterdam
     volumes:
-      - /mnt/usb/configurations/prowlarr:/config
+      - /home/beelink/configurations/prowlarr:/config
+    restart: unless-stopped
 
   qbittorrent-nox:
     image: qbittorrentofficial/qbittorrent-nox:latest
@@ -149,7 +246,7 @@ services:
       - "6881:6881/tcp"  # Torrent listening port
       - "6881:6881/udp"
     volumes:
-      - /mnt/usb/configurations/qbittorrent:/config
+      - /home/beelink/configurations/qbittorrent:/config
       - /mnt/usb/torrent-downloads:/downloads
     environment:
       - QBT_LEGAL_NOTICE=confirm
@@ -165,6 +262,48 @@ services:
     volumes:
       - ./qui:/config
 
+  jellystat-db:
+    image: 'postgres:15.2'
+    shm_size: 1gb
+    container_name: jellystat-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: YOUR_DB_PASSW_HERE
+    volumes:
+      - '/home/beelink/configurations/postgres:/var/lib/postgresql/data'
+  jellystat:
+    image: 'cyfershepard/jellystat:latest'
+    container_name: jellystat
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: YOUR_DB_PASSW_HERE
+      POSTGRES_IP: jellystat-db
+      POSTGRES_PORT: 5432
+      JWT_SECRET: YOUR_JWT_SECRET_HERE
+      TZ: Europe/Madrid
+      MINIMUM_SECONDS_TO_INCLUDE_PLAYBACK: 300
+    volumes:
+      - '/home/beelink/configurations/jellystat-backup-data:/app/backend/backup-data'
+    ports:
+      - '8106:3000'
+    depends_on:
+      - jellystat-db
+
+  swiparr:
+    image: ghcr.io/m3sserstudi0s/swiparr:latest
+    container_name: swiparr
+    restart: unless-stopped
+    environment:
+      - PROVIDER=jellyfin
+      - JELLYFIN_URL=http://192.168.1.155:8096
+      - JELLYFIN_PUBLIC_URL=https://jellyfin.myserver.com
+    volumes:
+      - /home/beelink/configurations/swiparr:/app/data
+    ports:
+      - 8110:4321
+
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
@@ -175,7 +314,8 @@ services:
     ports:
       - 8000:3000
     volumes:
-      - /mnt/usb/configurations/homepage:/app/config
+      - /home/beelink/configurations/homepage:/app/config
+      - /mnt/usb:/mnt/usb:ro
     restart: unless-stopped
 
   # metrics related:
@@ -217,13 +357,26 @@ services:
       - prometheus
     restart: unless-stopped
 
-  # NOTE: better run homeassistant alone in the rpi as OS (not container),
-  #       which has support for 'add-ons'.
-  #       More info: https://www.home-assistant.io/installation/#about-installation-types
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    volumes:
+      - /home/beelink/server-dockers/cloudflared:/etc/cloudflared
+      - /home/beelink/server-dockers/cloudflared/config:/home/nonroot/.cloudflared
+    networks:
+      - cloudflared_net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 networks:
+  cloudflared_net:
+    driver: bridge
   monitoring:
     driver: bridge
+  # lingarr:
+  #   external: true
 
 volumes:
  prometheus_data:

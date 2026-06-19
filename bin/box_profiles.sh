@@ -37,10 +37,16 @@ profile_dev_env() {
     yes | bash install-new-server.sh
 }
 
+profile_latex() {
+    sudo apt install latexmk
+    sudo apt install texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended
+}
+
 profile_default() {
     profile_minimal
     profile_nodejs
     profile_docker
     profile_ai
     profile_dev_env # includes rust
+    profile_latex
 }

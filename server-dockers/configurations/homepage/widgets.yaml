@@ -18,7 +18,7 @@
 - resources:
     label: "hard drive"
     expanded: true
-    disk: /app/config
+    disk: /mnt/usb
 
 - search:
     provider: duckduckgo

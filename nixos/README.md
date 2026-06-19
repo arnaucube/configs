@@ -28,6 +28,7 @@ sudo nix-env --profile /nix/var/nix/profiles/system --delete-generations 9 10 11
 
 # remove old generations except the last 5 generations
 sudo nix-env --profile /nix/var/nix/profiles/system --delete-generations +5
+```
 
 
 # update

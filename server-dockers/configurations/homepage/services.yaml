@@ -8,6 +8,10 @@
           icon: jellyfin.png
           href: http://192.168.1.155:8096
           description: Jellyfin Media Server
+      - Swiparr:
+          icon: swiparr.png
+          href: http://192.168.1.155:8110
+          description: match-based movie selection
   - Descarregues a ma:
       - qBittorrent:
           icon: qbittorrent.png
@@ -52,14 +56,31 @@
             url: http://192.168.1.155:8104
             key: API_KEY_HERE
             enableQueue: true
+      - lidarr:
+          icon: lidarr.png
+          href: http://192.168.1.155:8109
+          description: Automating download of music
+          widget:
+            type: lidarr
+            url: http://192.168.1.155:8109
+            key: API_KEY_HERE
+            enableQueue: true
       - bazarr:
           icon: bazarr.png
           href: http://192.168.1.155:8103
           description: Manage & download subtitles
+      - lingarr:
+          icon: lingarr.png
+          href: http://192.168.1.155:8107
+          description: automatically translate subtitles
       - prowlarr:
           icon: prowlarr.png
           href: http://192.168.1.155:8102
           description: API Support for torrent trackers 
+          widget:
+            type: prowlarr
+            url: http://192.168.1.155:8102
+            key: API_KEY_HERE
 
 - RightCol:
   - Altres:
@@ -67,6 +88,10 @@
           icon: grafana.png
           href: http://192.168.1.155:3000/d/rYdddlPWk/node-exporter-full
           description: beelink grafana dashboard
+      - jellystat:
+          icon: jellystat.png
+          href: http://192.168.1.155:8106
+          description: stats about jellyfin media
       - Galdric grafana:
           icon: grafana.png
           href: http://192.168.1.156:3000/d/rYdddlPWk/node-exporter-full
