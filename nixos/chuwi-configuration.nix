@@ -27,7 +27,7 @@
   users.users.user = {
     isNormalUser = true;
     description = "user";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "incus"];
     packages = with pkgs; [];
   };
 
@@ -64,7 +64,11 @@
 	xournalpp
   ];
 
-  services.logind.extraConfig = ''
-    HandlePowerKey=ignore
-  '';
+  # from version 25.05
+  #services.logind.extraConfig = ''
+  #  HandlePowerKey=ignore
+  #'';
+  services.logind.settings.Login = {
+    HandlePowerKey = "ignore";
+  };
 }

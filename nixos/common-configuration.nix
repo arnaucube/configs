@@ -44,7 +44,17 @@
 #    };
   };
   # --- sway wm config:
-  services.xserver.displayManager.gdm.enable=true;
+  #services.xserver.displayManager.gdm.enable=true; # v25.05
+  #services.displayManager.gdm.enable = true; # v26.05
+  services.displayManager.gdm.enable = false;
+  services.greetd = {
+	  enable = true;
+	  settings.default_session = {
+		  command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd sway";
+		  user = "greeter";
+	  };
+  };
+
   #services.displayManager.sessionPackages = [ pkgs.sway ];
   #services.xserver.displayManager.gdm.wayland=false;
   #services.xserver.displayManager.plasma5.enable=true;
@@ -82,8 +92,8 @@
 	keynav
 	unzip
 	gnutar
-	xorg.xmodmap # keyboard remapping
-	xfce.xfce4-screenshooter
+	xmodmap # keyboard remapping
+	xfce4-screenshooter
 	flameshot
 	pulseaudio
 	usbutils
@@ -96,7 +106,8 @@
 	# code editors
   	vim
 	neovim
-	vimHugeX # to make clipboard work in vim
+	vim-full
+	#vimHugeX # to make clipboard work in vim
 	xclip # to make clipboard work in neovim
 
 	# terminals
@@ -105,17 +116,17 @@
 
 	# pdf
 	zathura
-	mate.atril
+	atril
 
 	# file explorers/managers
 	lf
 	yazi
-	xfce.thunar
-	xfce.xfconf # needed to save preferences of thunar
-	xfce.ristretto
-	xfce.tumbler # for thumbnails of imgs
+	thunar
+	xfconf # needed to save preferences of thunar
+	ristretto
+	tumbler # for thumbnails of imgs
 	# for detecting usbs:
-	xfce.thunar-volman
+	thunar-volman
 	gvfs
 	polkit_gnome
 	udiskie
@@ -129,7 +140,7 @@
 	gimp
 	calibre
 	tauon
-	libsForQt5.kdenlive
+	kdePackages.kdenlive
 	libreoffice-qt6
 	ffmpeg
 
@@ -145,9 +156,10 @@
 	pgf
 	(pkgs.texlive.combine {
 		inherit (pkgs.texlive)
-		scheme-medium # includes latexmk
+		scheme-full # includes latexmk
 		minted # syntax highligting
 		pgf
+		yfonts
 		;
 	})
 	gnumake
@@ -183,19 +195,22 @@
 		meshtastic esptool # meshtastic related
 		unicodeit
 		setuptools
+		jupyterlab
 	]))
-	pipx
+	#pipx # removed bcs it has errors in the test suite
 	nodejs
 	pnpm
+	elan # lean
 
 	# other
 	qmk
 	vial
 	via
 
-	freecad
-	orca-slicer
+	#freecad
+	#orca-slicer
   ];
+
 
   environment.variables = {
 	OPENSSL_DEV = "${pkgs.openssl.dev}";
@@ -207,11 +222,11 @@
 	OPENSSL_STATIC="0";
 
 	# for screen sharing in sway
-	XDG_CURRENT_DESKTOP = "sway";
-	XDG_SESSION_TYPE="wayland";
+	#XDG_CURRENT_DESKTOP = "sway";
+	#XDG_SESSION_TYPE="wayland";
 
-	WAYLAND_DISPLAY="wayland-1";
-	XDG_RUNTIME_DIR="/run/user/$(id -u)";
+	#WAYLAND_DISPLAY="wayland-1";
+	#XDG_RUNTIME_DIR="/run/user/$(id -u)";
   };
 
   fonts.packages = with pkgs; [
@@ -238,11 +253,31 @@
   xdg.mime.defaultApplications = {
     "application/pdf" = "zathura";
   };
-  xdg.portal = {
-    enable = true;
-    wlr.enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-wlr ];
+  #xdg.portal = {
+  #  enable = true;
+  #  wlr.enable = true;
+  #  extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-wlr ];
+  #};
+
+xdg.portal = {
+  enable = true;
+  wlr.enable = true;
+
+  extraPortals = with pkgs; [
+    xdg-desktop-portal-gtk
+  ];
+
+  configPackages = with pkgs; [
+    xdg-desktop-portal-wlr
+    xdg-desktop-portal-gtk
+  ];
+
+  config.sway = {
+    default = "gtk";
+    "org.freedesktop.impl.portal.ScreenCast" = "wlr";
+    "org.freedesktop.impl.portal.Screenshot" = "wlr";
   };
+};
 
   # gvfs needed for Thunar to detect external disks
   services.gvfs.enable = true;
