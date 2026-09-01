@@ -48,6 +48,14 @@ Plug 'rust-lang/rust.vim'
 let g:rustfmt_fail_silently = 0
 let g:rustfmt_autosave = 1
 
+" Lean
+Plug 'Julian/lean.nvim'
+" let g:lean_config = {'mappings' = v:true}
+let g:lean_config = {
+      \ 'mappings': v:true,
+      \ }
+
+
 " javascript
 Plug 'jelera/vim-javascript-syntax'
 

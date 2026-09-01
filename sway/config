@@ -32,6 +32,8 @@ output * bg ~/Sync-tablet/wallpapers/geometry02_croped1920x1080.png fill
 output HDMI-A-1 resolution 3840x2160 position 1920 0
 # output eDP-1 resolution 1920x1200 position 0 0 transform 90
 output DSI-1 resolution 1920x1200 position 0 0 transform 90
+# output DSI-1 position 0 0
+output DP-2 resolution 1920x1200 position 1920 0
 
 # portable external monitor setup:
 # output DP-1 resolution 3840x2160 position 1920 0
@@ -92,7 +94,7 @@ bindsym $mod+Control+d exec poweroff
     # mouse button for dragging.
     floating_modifier $mod normal
 
-    # Reload the configuration file
+    # Reload the configuration file / restart sway from config file
     bindsym $mod+Shift+c reload
 
     # Exit sway (logs you out of your Wayland session)
@@ -249,20 +251,28 @@ bindsym $mod+Control+b exec sed -i 's/\"Regular\"#tag_for_shortcut/\"Bold\"#tag_
 bindsym $mod+Control+Shift+b exec sed -i 's/\"Bold\"#tag_for_shortcut/\"Regular\"#tag_for_shortcut/g' ~/.config/alacritty/alacritty.toml
 
 # move current workspace to another display
-bindsym $mod+Control+k move workspace to output HDMI-A-1
-bindsym $mod+Control+j move workspace to output eDP-1
+# bindsym $mod+Control+k move workspace to output HDMI-A-1
+# bindsym $mod+Control+j move workspace to output eDP-1
 # bindsym $mod+Control+j move workspace to output DP-1
 # bindsym $mod+Control+k move workspace to output eDP-1
 # bindsym $mod+Control+k move workspace to output DP-1
+bindsym $mod+Control+j move workspace to output DSI-1
+bindsym $mod+Control+k move workspace to output DP-2
 
-# remap capslock to control
-input * {
-    xkb_options ctrl:nocaps
+input type:keyboard {
+    xkb_layout us
+    # xkb_options:
+    #   - ctrl:nocaps = remap capslock to control
+    #   - compose:ralt = special characters, ie.
+    #       RightAlt, ~, n = ñ
+    #       RightAlt, comma, c = ç
+    xkb_options "ctrl:nocaps,compose:ralt"
 }
 
 # for screen sharing
-exec systemctl --user import-environment XDG_SESSION_TYPE XDG_CURRENT_DESKTOP
-exec dbus-update-activation-environment WAYLAND_DISPLAY
+#exec systemctl --user import-environment XDG_SESSION_TYPE XDG_CURRENT_DESKTOP
+#exec dbus-update-activation-environment WAYLAND_DISPLAY
+
 # systemctl --user daemon-reexec
 # systemctl --user restart pipewire
 # systemctl --user restart xdg-desktop-portal
