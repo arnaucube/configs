@@ -264,8 +264,9 @@ input type:keyboard {
     # xkb_options:
     #   - ctrl:nocaps = remap capslock to control
     #   - compose:ralt = special characters, ie.
-    #       RightAlt, ~, n = ñ
     #       RightAlt, comma, c = ç
+    #       RightAlt, equal, c = €
+    #       RightAlt, ~, n = ñ
     xkb_options "ctrl:nocaps,compose:ralt"
 }
 
