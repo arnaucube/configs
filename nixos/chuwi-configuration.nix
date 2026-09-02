@@ -1,7 +1,7 @@
 # This file is meant to be renamed to `configuration.nix`
-# Chuwi minibook NixOS configuration
+# Chuwi minibook NixOS configuration.
 
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   imports =
@@ -16,19 +16,16 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "chuwi"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Enable networking
+  # NetworkManager owns DHCP for the physical interfaces.
   networking.networkmanager.enable = true;
+  networking.useDHCP = false;
   hardware.cpu.intel.updateMicrocode = true;
-
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.user = {
     isNormalUser = true;
     description = "user";
-    extraGroups = [ "networkmanager" "wheel" "incus"];
-    packages = with pkgs; [];
+    extraGroups = [ "networkmanager" "wheel" "incus" ];
   };
 
   # Allow unfree packages
@@ -42,32 +39,21 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.11"; # Did you read the comment?
 
-  # Chuwi specific:
-  # fix wifi issues
+  # Chuwi-specific Wi-Fi workaround.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # fix screen rotation issue
-  boot.kernelParams = [
-    "fbcon=rotate:1"
-  ];
-  services.xserver.xrandrHeads = [
-    {
-      monitorConfig = "Option \"Rotate\" \"right\"";
-      output = "DSI-1";
-    }
-  ];
+  # Rotate both the virtual console and the internal Sway output.
+  boot.kernelParams = [ "fbcon=rotate:1" ];
+  environment.etc."sway/config.d/20-chuwi-display.conf".text = ''
+    output DSI-1 transform 90
+  '';
 
-  # some extra packages
+  # Chuwi-specific packages.
   environment.systemPackages = with pkgs; [
-	# note taking
-	rnote
-	xournalpp
+    rnote
+    xournalpp
   ];
 
-  # from version 25.05
-  #services.logind.extraConfig = ''
-  #  HandlePowerKey=ignore
-  #'';
   services.logind.settings.Login = {
     HandlePowerKey = "ignore";
   };

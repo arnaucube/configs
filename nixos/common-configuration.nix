@@ -1,6 +1,6 @@
 # This file contains the config shared across different devices.
 
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   # Set your time zone.
@@ -21,214 +21,160 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-#  services.displayManager = {
-#      defaultSession = "none+i3";
-#  };
-  services.xserver = {
-    xkb = { # Configure keymap in X11
-      layout = "us";
-      variant = "";
-    };
-
-    enable=true;
-#    #displayManager = {
-#    #  defaultSession = "none+i3";
-#    #};
-#    windowManager.i3 = {
-#      enable=true;
-#      extraPackages = with pkgs; [
-#        dmenu
-#        i3status
-#        i3lock
-#      ];
-#    };
-  };
-  # --- sway wm config:
-  #services.xserver.displayManager.gdm.enable=true; # v25.05
-  #services.displayManager.gdm.enable = true; # v26.05
-  services.displayManager.gdm.enable = false;
+  # Sway session managed by greetd.
   services.greetd = {
-	  enable = true;
-	  settings.default_session = {
-		  command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd sway";
-		  user = "greeter";
-	  };
+    enable = true;
+    settings.default_session = {
+      command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd sway";
+      user = "greeter";
+    };
   };
 
-  #services.displayManager.sessionPackages = [ pkgs.sway ];
-  #services.xserver.displayManager.gdm.wayland=false;
-  #services.xserver.displayManager.plasma5.enable=true;
-  # Enable the gnome-keyring secrets vault. 
-  # Will be exposed through DBus to programs willing to store secrets.
+  # Enable and unlock the GNOME Keyring through greetd's PAM session.
   services.gnome.gnome-keyring.enable = true;
-  # enable sway wm
+  security.pam.services.greetd.enableGnomeKeyring = true;
+
   programs.sway = {
     enable = true;
     wrapperFeatures.gtk = true;
   };
   security.polkit.enable = true;
-  # --- end of sway config.
 
-  environment.systemPackages = with pkgs; [
-	# sway wm utilities
-	grim # screenshot functionality
-	slurp # screenshot functionality
-	wl-clipboard # wl-copy and wl-paste for copy/paste from stdin / stdout
-	mako # notification system developed by swaywm maintainer
-
-	# utilities
- 	wget
-	tmux
-	git
-	delta
-	tig
-	mosh
-	bat
-	ripgrep
-	fzf
-	screenfetch
-	htop
-	jq
-	keynav
-	unzip
-	gnutar
-	xmodmap # keyboard remapping
-	xfce4-screenshooter
-	flameshot
-	pulseaudio
-	usbutils
-	time
-	#impala # nmtui alternative
-	fastfetch
-	rpm
-	pdfgrep # to find strings across pdfs in directories
-
-	# code editors
-  	vim
-	neovim
-	vim-full
-	#vimHugeX # to make clipboard work in vim
-	xclip # to make clipboard work in neovim
-
-	# terminals
-	alacritty
-	kitty
-
-	# pdf
-	zathura
-	atril
-
-	# file explorers/managers
-	lf
-	yazi
-	thunar
-	xfconf # needed to save preferences of thunar
-	ristretto
-	tumbler # for thumbnails of imgs
-	# for detecting usbs:
-	thunar-volman
-	gvfs
-	polkit_gnome
-	udiskie
-
-	# media
-	pavucontrol
-	mpv
-	vlc
-	feh
-	#kolourpaint
-	gimp
-	calibre
-	tauon
-	kdePackages.kdenlive
-	libreoffice-qt6
-	ffmpeg
-
-	# browsers
-	firefox
-	qutebrowser
-	chromium
-
-	# languages
-	#texlive.combined.scheme-medium # includes latexmk
-	#texlivePackages.minted
-	pgf-umlsd # latex diagrams
-	pgf
-	(pkgs.texlive.combine {
-		inherit (pkgs.texlive)
-		scheme-full # includes latexmk
-		minted # syntax highligting
-		pgf
-		yfonts
-		;
-	})
-	gnumake
-	gcc
-	clang
-	clang-tools
-
-	openssl
-	openssl.dev
-	glib       # GLib base library
-	#gio        # GIO library
-	gdk-pixbuf # GDK Pixbuf library
-	gtk3       # GTK3 including GDK, relevant for gdk-sys
-	atk        # Accessibility Toolkit
-	cairo      # 2D graphics library
-	pango      # Text layout and rendering
-	pkg-config # Needed for pkg-config to find .pc files
-	cmake
-
-	stdenv
-	rustup
-	wabt # wasm binary toolkit
-	wasmedge # to execute wasm binaries
-	sage
-	coq
-	coqPackages.mathcomp
-	#coqPackages.coqide
-	opam # ocaml package manager, for coq packages
-	go
-	(python3.withPackages(ps: with ps; [
-		matplotlib numpy
-		qmk
-		meshtastic esptool # meshtastic related
-		unicodeit
-		setuptools
-		jupyterlab
-	]))
-	#pipx # removed bcs it has errors in the test suite
-	nodejs
-	pnpm
-	elan # lean
-
-	# other
-	qmk
-	vial
-	via
-
-	#freecad
-	#orca-slicer
-  ];
-
-
-  environment.variables = {
-	OPENSSL_DEV = "${pkgs.openssl.dev}";
-	OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
-	OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
-	PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
-
-	OPENSSL_NO_VENDOR="1";
-	OPENSSL_STATIC="0";
-
-	# for screen sharing in sway
-	#XDG_CURRENT_DESKTOP = "sway";
-	#XDG_SESSION_TYPE="wayland";
-
-	#WAYLAND_DISPLAY="wayland-1";
-	#XDG_RUNTIME_DIR="/run/user/$(id -u)";
+  # Minimal Sway sessions do not process XDG autostart entries, so start the
+  # authentication agent explicitly with the graphical user session.
+  systemd.user.services.polkit-gnome-authentication-agent = {
+    description = "Polkit GNOME authentication agent";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target"];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+      Restart = "on-failure";
+    };
   };
 
+  # Automatically mount removable media while the graphical session is active.
+  systemd.user.services.udiskie = {
+    description = "Udiskie removable media automounter";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.udiskie}/bin/udiskie --no-tray";
+      Restart = "on-failure";
+    };
+  };
+  environment.systemPackages = with pkgs; [
+    # Sway utilities
+    grim
+    slurp
+    wl-clipboard
+    mako
+
+    # Utilities
+    wget
+    tmux
+    git
+    delta
+    tig
+    mosh
+    bat
+    ripgrep
+    fzf
+    htop
+    jq
+    unzip
+    gnutar
+    flameshot
+    pulseaudio
+    usbutils
+    time
+    fastfetch
+    rpm
+    pdfgrep
+    keynav
+    screenfetch
+
+    # Editors and terminals
+    neovim
+    vim-full
+    alacritty
+    kitty
+
+    # Documents and file management
+    zathura
+    atril
+    lf
+    yazi
+    thunar
+    xfconf
+    ristretto
+    tumbler
+    thunar-volman
+    udiskie # auto-mount usb (needed for sway)
+    polkit_gnome # let unprivileged users mount filesystems
+
+    # Media
+    pavucontrol
+    mpv
+    vlc
+    feh
+    gimp
+    calibre
+    tauon
+    kdePackages.kdenlive
+    libreoffice-qt6
+    ffmpeg
+
+    # Browsers
+    firefox
+    qutebrowser
+    chromium
+
+    # Development
+    texlive.combined.scheme-full
+    gnumake
+    gcc
+    clang
+    clang-tools
+    openssl
+    openssl.dev
+    glib
+    gdk-pixbuf
+    gtk3
+    atk
+    cairo
+    pango
+    pkg-config
+    cmake
+    rustup
+    wabt
+    wasmedge
+    sage
+    coq
+    coqPackages.mathcomp
+    opam
+    go
+    (python3.withPackages (ps: with ps; [
+      matplotlib
+      numpy
+      meshtastic
+      esptool
+      unicodeit
+      setuptools
+      jupyterlab
+    ]))
+    nodejs
+    pnpm
+    elan
+
+    # Keyboard firmware
+    qmk
+    vial
+    via
+  ];
   fonts.packages = with pkgs; [
     dina-font
     proggyfonts
@@ -243,41 +189,31 @@
 
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;
-  environment.shells = with pkgs; [zsh];
+  environment.shells = [ pkgs.zsh ];
 
-  # set default pdf reader to zathura
-  xdg.mime.enable=true;
+  # Set the web browser and default PDF reader.
+  xdg.mime.enable = true;
   environment.sessionVariables = {
-    BROWSER = "zathura";
+    BROWSER = "firefox";
   };
   xdg.mime.defaultApplications = {
-    "application/pdf" = "zathura";
+    "application/pdf" = "org.pwmt.zathura.desktop";
+    "text/html" = "firefox.desktop";
+    "x-scheme-handler/http" = "firefox.desktop";
+    "x-scheme-handler/https" = "firefox.desktop";
   };
-  #xdg.portal = {
-  #  enable = true;
-  #  wlr.enable = true;
-  #  extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-wlr ];
-  #};
 
-xdg.portal = {
-  enable = true;
-  wlr.enable = true;
+  xdg.portal = {
+    enable = true;
+    xdgOpenUsePortal = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
-  extraPortals = with pkgs; [
-    xdg-desktop-portal-gtk
-  ];
-
-  configPackages = with pkgs; [
-    xdg-desktop-portal-wlr
-    xdg-desktop-portal-gtk
-  ];
-
-  config.sway = {
-    default = "gtk";
-    "org.freedesktop.impl.portal.ScreenCast" = "wlr";
-    "org.freedesktop.impl.portal.Screenshot" = "wlr";
+    config.sway = {
+      default = "gtk";
+      "org.freedesktop.impl.portal.ScreenCast" = "wlr";
+      "org.freedesktop.impl.portal.Screenshot" = "wlr";
+    };
   };
-};
 
   # gvfs needed for Thunar to detect external disks
   services.gvfs.enable = true;
@@ -288,30 +224,20 @@ xdg.portal = {
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
-  #hardware.pulseaudio.enable = true;
-  #services.pulseaudio.enable = true;
-  #services.pipewire.pulse.enable=false;
-  #services.pipewire.enable=false;
   services.pipewire = {
-    enable = true;          # Enable PipeWire service
-    alsa.enable = true;     # Enable ALSA support (audio hardware)
-    alsa.support32Bit = true; # Support 32-bit apps on 64-bit systems
-    pulse.enable = true;    # Enable PipeWire PulseAudio replacement
-    wireplumber.enable = true; # Enable WirePlumber session manager (recommended)
-    jack.enable = true;     # Enable JACK support if needed
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    wireplumber.enable = true;
+    jack.enable = true;
   };
 
   # udev rules (for Vial)
   services.udev.extraRules = ''
-    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="4653", ATTRS{idProduct}=="0001", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="4653", ATTRS{idProduct}=="0001", MODE="0660", GROUP="users", TAG+="uaccess"
   '';
-  services.udev.packages = with pkgs; [
-    qmk
-    qmk-udev-rules
-    qmk_hid
-    via
-    vial
-  ];
+  services.udev.packages = [ pkgs.qmk-udev-rules ];
 
   nix.settings.extra-experimental-features = [ "nix-command" "flakes" ];
 }
