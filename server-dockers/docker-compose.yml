@@ -42,6 +42,7 @@
 # - libretranslate: 8108
 # - lidarr: 8109
 # - swiparr: 8110
+# - jellyfin-news: 8111
 # - qbittorrent: 8080
 # - homepage: 8000
 # - grafana: 3000
@@ -303,6 +304,14 @@ services:
       - /home/beelink/configurations/swiparr:/app/data
     ports:
       - 8110:4321
+
+
+    jellyfin-news:
+      build: ./jellyfin-news
+      restart: unless-stopped
+      env_file: ./jellyfin-news/.env
+      ports:
+        - "8111:8080"
 
   homepage:
     image: ghcr.io/gethomepage/homepage:latest

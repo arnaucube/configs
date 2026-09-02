@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jellyfin updates</title>
+  <style>
+    body { max-width: 760px; margin: 2rem auto; padding: 0 1rem; font: 16px/1.5 system-ui, sans-serif; color: #202124; }
+    h1 { margin-bottom: .25rem; }
+    .controls { display: flex; flex-wrap: wrap; gap: .65rem; margin: 1.5rem 0; align-items: center; }
+    button, input { font: inherit; padding: .6rem .8rem; }
+    button { cursor: pointer; }
+    input { width: 5rem; }
+    #status { min-height: 1.5rem; color: #555; }
+    textarea { box-sizing: border-box; width: 100%; min-height: 22rem; padding: 1rem; font: 15px/1.5 ui-monospace, monospace; resize: vertical; }
+    .copy { margin-top: .65rem; }
+  </style>
+</head>
+<body>
+  <h1>Jellyfin updates</h1>
+  <p>Choose a period, then copy the generated recap.</p>
+
+  <div class="controls">
+    <button data-report="/api/current-week">Current week</button>
+  </div>
+
+  <div class="controls">
+    <label for="week-offset">Week offset:</label>
+    <input id="week-offset" type="number" min="-1200" max="-1" value="-1" required>
+    <button id="selected-week">Load selected week</button>
+    <span>−1 is last week, −2 is two weeks ago</span>
+  </div>
+
+  <div class="controls">
+    <label for="month-offset">Month offset:</label>
+    <input id="month-offset" type="number" min="-1200" max="-1" value="-1" required>
+    <button id="selected-month">Load selected month</button>
+    <span>−1 is last month, −2 is two months ago</span>
+  </div>
+
+  <p id="status" role="status"></p>
+  <textarea id="output" readonly aria-label="Jellyfin update output" placeholder="Your recap will appear here"></textarea>
+  <button id="copy" class="copy">Copy to clipboard</button>
+
+  <script>
+    const output = document.querySelector('#output');
+    const status = document.querySelector('#status');
+    const buttons = [...document.querySelectorAll('button')];
+
+    async function loadReport(url) {
+      buttons.forEach(button => button.disabled = true);
+      status.textContent = 'Loading…';
+      try {
+        const response = await fetch(url, { headers: { Accept: 'text/plain' } });
+        const text = await response.text();
+        if (!response.ok) throw new Error(text.trim() || `Request failed (${response.status})`);
+        output.value = text;
+        status.textContent = 'Recap ready.';
+      } catch (error) {
+        status.textContent = error.message;
+      } finally {
+        buttons.forEach(button => button.disabled = false);
+      }
+    }
+
+    document.querySelectorAll('[data-report]').forEach(button => {
+      button.addEventListener('click', () => loadReport(button.dataset.report));
+    });
+
+    document.querySelector('#selected-week').addEventListener('click', () => {
+      const offset = document.querySelector('#week-offset').value;
+      loadReport(`/api/week?offset=${encodeURIComponent(offset)}`);
+    });
+
+    document.querySelector('#selected-month').addEventListener('click', () => {
+      const offset = document.querySelector('#month-offset').value;
+      loadReport(`/api/month?offset=${encodeURIComponent(offset)}`);
+    });
+
+    document.querySelector('#copy').addEventListener('click', async () => {
+      if (!output.value) return;
+      try {
+        await navigator.clipboard.writeText(output.value);
+      } catch (_) {
+        output.select();
+        document.execCommand('copy');
+        output.setSelectionRange(0, 0);
+      }
+      status.textContent = 'Copied to clipboard.';
+    });
+  </script>
+</body>
+</html>
