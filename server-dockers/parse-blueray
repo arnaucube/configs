@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+# Utility to get the .mkv out of .rar/blueray files from the current directory
+# and subdirectories.
+
+set -Eeuo pipefail
+shopt -s nullglob
+
+OUT="${OUT:-$PWD}"
+echo "output: $OUT"
+
+pick_rar() {
+  # prefer part01, else any .rar, else .r00
+  for p in *.[Pp][Aa][Rr][Tt]01.[Rr][Aa][Rr] *.[Pp][Aa][Rr][Tt]001.[Rr][Aa][Rr]; do [[ -f "$p" ]] && { echo "$p"; return; }; done
+  for r in *.[Rr][Aa][Rr]; do [[ -f "$r" ]] && { echo "$r"; return; }; done
+  for r in *.[Rr]00; do [[ -f "$r" ]] && { echo "$r"; return; }; done
+  return 1
+}
+
+pick_video() {
+  find "$1" -type f \
+    \( -iname '*.mkv' -o -iname '*.mp4' -o -iname '*.avi' -o -iname '*.m2ts' \) \
+    ! -iname '*sample*' \
+    -printf '%s\t%p\n' 2>/dev/null \
+  | sort -nr | head -n1 | cut -f2-
+}
+
+process_dir() {
+  local dir="$1"
+  echo "==> $dir"
+  pushd "$dir" >/dev/null
+
+  local rar
+  if ! rar="$(pick_rar)"; then
+    echo "  no rar found, skipping"
+    popd >/dev/null
+    return
+  fi
+
+  local base out tmp video
+  base="$(basename "$(pwd)")"
+  out="$OUT/${base}.mkv"
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  unrar x -o+ -idq "$rar" "$tmp/" || { echo "  extract failed"; popd >/dev/null; return; }
+
+  video="$(pick_video "$tmp")"
+  [[ -n "${video:-}" ]] || { echo "  no video found"; popd >/dev/null; return; }
+
+  echo "  muxing -> $out"
+  mkvmerge -o "$out" "$video"
+
+  popd >/dev/null
+}
+
+for d in . */; do
+  [[ -d "$d" ]] || continue
+  process_dir "$d"
+done

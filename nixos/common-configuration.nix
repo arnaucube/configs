@@ -157,7 +157,9 @@
     coqPackages.mathcomp
     opam
     go
+    gopls
     (python3.withPackages (ps: with ps; [
+      pynvim
       matplotlib
       numpy
       meshtastic

@@ -77,19 +77,9 @@ Plug 'lervag/vimtex'
 " Coq/Rocq
 Plug 'whonore/Coqtail'
 
-" deoplete
-Plug 'Shougo/deoplete.nvim'
-let g:deoplete#enable_at_startup = 1
-autocmd CompleteDone * pclose!
-" Plug 'zchee/deoplete-go', {'build': {'unix': 'make'}}
-" " neosnippet with deoplete
-" Plug 'Shougo/neosnippet.vim'
-" Plug 'Shougo/neosnippet-snippets'
-" " Plugin deoplete neosnippet key-mappings.
-" " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
-" imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-" smap <C-k>     <Plug>(neosnippet_expand_or_jump)
-" xmap <C-k>     <Plug>(neosnippet_expand_target)
+" completion and native LSP support. v1 while v2 is unstable
+Plug 'saghen/blink.cmp', { 'tag': 'v1.*' }
+Plug 'neovim/nvim-lspconfig'
 
 " automatically adjust shiftwidth and expand tab based on current file
 Plug 'tpope/vim-sleuth'
@@ -97,15 +87,6 @@ Plug 'tpope/vim-sleuth'
 
 " errors
 Plug 'Valloric/ListToggle'
-Plug 'autozimu/LanguageClient-neovim', {
-    \ 'branch': 'next',
-    \ 'do': 'bash install.sh',
-    \ }
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" after PlugInstall, install coc-rust-analyzer:
-" :CocInstall coc-rust-analyzer
-" also run (outside vim, in a shell):
-" rustup component add rust-analyzer
 
 " focus mode
 Plug 'junegunn/goyo.vim'
@@ -125,6 +106,27 @@ Plug 'noahfrederick/vim-hemisu'
 Plug 'JaySandhu/xcode-vim'
 
 call plug#end()
+
+lua << EOF
+require('blink.cmp').setup({
+  keymap = { preset = 'default' },
+  completion = { documentation = { auto_show = true } },
+  sources = { default = { 'lsp', 'path', 'snippets', 'buffer' } },
+  fuzzy = { implementation = 'prefer_rust_with_warning' },
+})
+
+-- nvim-lspconfig supplies these server definitions to Neovim's native LSP.
+local capabilities = require('blink.cmp').get_lsp_capabilities()
+vim.lsp.config('gopls', { capabilities = capabilities })
+vim.lsp.config('rust_analyzer', { capabilities = capabilities })
+vim.lsp.enable({ 'gopls', 'rust_analyzer' })
+
+vim.keymap.set('n', '<F6>', vim.lsp.buf.code_action)
+vim.keymap.set('n', 'K', vim.lsp.buf.hover)
+vim.keymap.set('n', 'KK', vim.lsp.buf.hover)
+vim.keymap.set('n', 'gd', vim.lsp.buf.definition)
+vim.keymap.set('n', '<F2>', vim.lsp.buf.rename)
+EOF
 
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 set termguicolors
@@ -188,27 +190,9 @@ let g:airline_skip_empty_sections = 1
 
 
 " errors
-"" For go needs gopls installed (comes with vim-go pluggin)
-"" For rust with rust-analyzer needs https://rust-analyzer.github.io/manual.html#rust-analyzer-language-server-binary installed
-""  --> place it at ~.local/bin or ~/bin and make sure that the PATH is defined (eg. in .zshrc: export PATH=$PATH:.local/bin)
-""      [old] for rust with rls needs https://github.com/rust-lang/rls installed
+"" native LSP requires gopls and rust-analyzer to be available on PATH.
 let g:lt_location_list_toggle_map = '<leader>l'
 let g:lt_quickfix_list_toggle_map = '<leader>s'
-" \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
-let g:LanguageClient_serverCommands = {
-    \ 'go': ['~/go/bin/gopls'],
-    \ 'rust': ['rust-analyzer'],
-    \ }
-let g:LanguageClient_diagnosticsList = "Quickfix"
-let g:LanguageClient_diagnosticsEnable = 1
-
-" language server key bindings
-nnoremap <F6> :call LanguageClient_contextMenu()<CR>
-" Specific mappings of LanguageClient each action separately
-nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
-nnoremap <silent> KK :call LanguageClient#textDocument_hover()<CR>
-nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
-nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
 
 noremap <silent> <C-c>          :cn<CR>
 
@@ -290,3 +274,4 @@ colorscheme gruvbox
 set conceallevel=0
 
 highlight normal ctermbg=0 guibg=#000000
+
