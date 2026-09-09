@@ -8,34 +8,43 @@
     body { max-width: 760px; margin: 2rem auto; padding: 0 1rem; font: 16px/1.5 system-ui, sans-serif; color: #202124; }
     h1 { margin-bottom: .25rem; }
     .controls { display: flex; flex-wrap: wrap; gap: .65rem; margin: 1.5rem 0; align-items: center; }
-    button, input { font: inherit; padding: .6rem .8rem; }
+    button, input, select { font: inherit; padding: .6rem .8rem; }
     button { cursor: pointer; }
     input { width: 5rem; }
     #status { min-height: 1.5rem; color: #555; }
     textarea { box-sizing: border-box; width: 100%; min-height: 22rem; padding: 1rem; font: 15px/1.5 ui-monospace, monospace; resize: vertical; }
+    [hidden] { display: none; }
     .copy { margin-top: .65rem; }
   </style>
 </head>
 <body>
   <h1>Jellyfin updates</h1>
-  <p>Choose a period, then copy the generated recap.</p>
+  <p>Choose a time period, then generate a newly added or watched recap.</p>
 
   <div class="controls">
-    <button data-report="/api/current-week">Current week</button>
+    <label for="period">Time period:</label>
+    <select id="period">
+      <option value="current-week">Current week</option>
+      <option value="week">Past week</option>
+      <option value="month">Past month</option>
+    </select>
   </div>
 
-  <div class="controls">
+  <div id="week-controls" class="controls" hidden>
     <label for="week-offset">Week offset:</label>
     <input id="week-offset" type="number" min="-1200" max="-1" value="-1" required>
-    <button id="selected-week">Load selected week</button>
     <span>−1 is last week, −2 is two weeks ago</span>
   </div>
 
-  <div class="controls">
+  <div id="month-controls" class="controls" hidden>
     <label for="month-offset">Month offset:</label>
     <input id="month-offset" type="number" min="-1200" max="-1" value="-1" required>
-    <button id="selected-month">Load selected month</button>
     <span>−1 is last month, −2 is two months ago</span>
+  </div>
+
+  <div class="controls">
+    <button id="added">Newly added in selected period</button>
+    <button id="watched">{{WATCHED_BUTTON}}</button>
   </div>
 
   <p id="status" role="status"></p>
@@ -43,12 +52,13 @@
   <button id="copy" class="copy">Copy to clipboard</button>
 
   <script>
+    const period = document.querySelector('#period');
     const output = document.querySelector('#output');
     const status = document.querySelector('#status');
-    const buttons = [...document.querySelectorAll('button')];
+    const controls = [...document.querySelectorAll('button, input, select')];
 
     async function loadReport(url) {
-      buttons.forEach(button => button.disabled = true);
+      controls.forEach(control => control.disabled = true);
       status.textContent = 'Loading…';
       try {
         const response = await fetch(url, { headers: { Accept: 'text/plain' } });
@@ -59,23 +69,35 @@
       } catch (error) {
         status.textContent = error.message;
       } finally {
-        buttons.forEach(button => button.disabled = false);
+        controls.forEach(control => control.disabled = false);
       }
     }
 
-    document.querySelectorAll('[data-report]').forEach(button => {
-      button.addEventListener('click', () => loadReport(button.dataset.report));
-    });
+    // Period changes only update the selection; either report can run first.
+    function updatePeriod() {
+      document.querySelector('#week-controls').hidden = period.value !== 'week';
+      document.querySelector('#month-controls').hidden = period.value !== 'month';
+      output.value = '';
+      status.textContent = '';
+    }
+    period.addEventListener('change', updatePeriod);
+    document.querySelectorAll('input').forEach(input => input.addEventListener('input', updatePeriod));
+    updatePeriod();
 
-    document.querySelector('#selected-week').addEventListener('click', () => {
-      const offset = document.querySelector('#week-offset').value;
-      loadReport(`/api/week?offset=${encodeURIComponent(offset)}`);
-    });
-
-    document.querySelector('#selected-month').addEventListener('click', () => {
-      const offset = document.querySelector('#month-offset').value;
-      loadReport(`/api/month?offset=${encodeURIComponent(offset)}`);
-    });
+    function generateReport(watched) {
+      const selectedPeriod = period.value;
+      const params = new URLSearchParams();
+      if (selectedPeriod !== 'current-week') {
+        const offset = document.querySelector(`#${selectedPeriod}-offset`);
+        if (!offset.reportValidity()) return;
+        params.set('offset', offset.value);
+      }
+      if (watched) params.set('period', selectedPeriod);
+      const path = watched ? '/api/watched' : `/api/${selectedPeriod}`;
+      loadReport(`${path}${params.size ? `?${params}` : ''}`);
+    }
+    document.querySelector('#added').addEventListener('click', () => generateReport(false));
+    document.querySelector('#watched').addEventListener('click', () => generateReport(true));
 
     document.querySelector('#copy').addEventListener('click', async () => {
       if (!output.value) return;

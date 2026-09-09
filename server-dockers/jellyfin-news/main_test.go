@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -114,5 +115,71 @@ func TestIndex(t *testing.T) {
 	testApp(&fakeSource{}).routes().ServeHTTP(response, request)
 	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "Jellyfin updates") {
 		t.Fatalf("status = %d, body = %q", response.Code, response.Body.String())
+	}
+}
+
+type fakeWatched struct {
+	start, end time.Time
+	err        error
+}
+
+func (f *fakeWatched) WatchedBetween(_ context.Context, start, end time.Time) ([]WatchedTitle, error) {
+	f.start, f.end = start, end
+	return []WatchedTitle{{ID: "movie", Name: "Example", Type: "Movie", Users: 2}}, f.err
+}
+
+func TestWatchedPeriods(t *testing.T) {
+	for _, tc := range []struct{ query, start, end string }{
+		{"period=current-week", "2026-08-31T00:00:00Z", "2026-09-02T12:00:00Z"},
+		{"period=week&offset=-2", "2026-08-17T00:00:00Z", "2026-08-24T00:00:00Z"},
+		{"period=month&offset=-1", "2026-08-01T00:00:00Z", "2026-09-01T00:00:00Z"},
+	} {
+		t.Run(tc.query, func(t *testing.T) {
+			a := testApp(&fakeSource{})
+			source := &fakeWatched{}
+			a.jellystat = source
+			response := httptest.NewRecorder()
+			a.routes().ServeHTTP(response, httptest.NewRequest("GET", "/api/watched?"+tc.query, nil))
+			if response.Code != 200 || !strings.Contains(response.Body.String(), "Example — 2 users") {
+				t.Fatalf("response: %d %s", response.Code, response.Body.String())
+			}
+			if source.start.Format(time.RFC3339) != tc.start || source.end.Format(time.RFC3339) != tc.end {
+				t.Fatalf("range: %v to %v", source.start, source.end)
+			}
+			if response.Header().Get("Cache-Control") != "no-store" {
+				t.Fatal("missing no-store")
+			}
+		})
+	}
+}
+
+func TestWatchedErrors(t *testing.T) {
+	for _, tc := range []struct {
+		query  string
+		source watchedSource
+		status int
+	}{
+		{"period=current-week", nil, 503},
+		{"period=week&offset=0", nil, 400},
+		{"period=invalid", nil, 400},
+		{"period=current-week", &fakeWatched{err: fmt.Errorf("upstream failure")}, 502},
+	} {
+		a := testApp(&fakeSource{})
+		a.jellystat = tc.source
+		response := httptest.NewRecorder()
+		a.routes().ServeHTTP(response, httptest.NewRequest("GET", "/api/watched?"+tc.query, nil))
+		if response.Code != tc.status {
+			t.Fatalf("status = %d, want %d", response.Code, tc.status)
+		}
+	}
+}
+
+func TestWatchedButtonEscapesTranslation(t *testing.T) {
+	a := testApp(&fakeSource{})
+	a.labels.WatchedButton = "<Watch & copy>"
+	response := httptest.NewRecorder()
+	a.routes().ServeHTTP(response, httptest.NewRequest("GET", "/", nil))
+	if !strings.Contains(response.Body.String(), "&lt;Watch &amp; copy&gt;") {
+		t.Fatal("button translation not escaped")
 	}
 }

@@ -1,6 +1,6 @@
 # Jellyfin update webpage
 
-A small Go web server for generating copyable Jellyfin movie and episode recaps. It serves one embedded `index.html` page, a database, or third-party Go dependencies.
+A small Go web server for generating copyable Jellyfin movie and episode recaps. It provides both: newly added movies and shows, and recently watched movies and shows. It serves one embedded `index.html` page, a database, or third-party Go dependencies.
 
 The page provides:
 

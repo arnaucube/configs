@@ -20,6 +20,10 @@ type Item struct {
 
 // Labels contains every translatable phrase used in generated recap text.
 type Labels struct {
+	WatchedUpdate  string
+	NoWatchedItems string
+	Users          string
+	WatchedButton  string
 	WeeklyUpdate   string
 	MonthlyUpdate  string
 	Movies         string
@@ -35,6 +39,10 @@ type Labels struct {
 
 func DefaultLabels() Labels {
 	return Labels{
+		WatchedUpdate:  "jellyfin watched recap",
+		NoWatchedItems: "No movies or shows watched in this period.",
+		Users:          "users",
+		WatchedButton:  "Watched in selected period",
 		WeeklyUpdate:   "jellyfin weekly update",
 		MonthlyUpdate:  "jellyfin monthly update",
 		Movies:         "Movies",

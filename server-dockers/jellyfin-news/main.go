@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"errors"
 	"flag"
+	"html"
 	"log"
 	"net/http"
 	"os"
@@ -20,11 +21,16 @@ type itemSource interface {
 	AddedBetween(context.Context, time.Time, time.Time) ([]Item, error)
 }
 
+type watchedSource interface {
+	WatchedBetween(context.Context, time.Time, time.Time) ([]WatchedTitle, error)
+}
+
 type app struct {
-	jellyfin itemSource
-	location *time.Location
-	labels   Labels
-	now      func() time.Time
+	jellystat watchedSource
+	jellyfin  itemSource
+	location  *time.Location
+	labels    Labels
+	now       func() time.Time
 }
 
 func main() {
@@ -41,6 +47,12 @@ func main() {
 	}
 
 	application := &app{jellyfin: client, location: location, labels: loadLabels(), now: time.Now}
+	if baseURL := os.Getenv("JELLYSTAT_URL"); strings.TrimSpace(baseURL) != "" {
+		application.jellystat, err = NewJellystat(baseURL, os.Getenv("JELLYSTAT_API_KEY"))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	server := &http.Server{
 		Addr:              *listen,
 		Handler:           application.routes(),
@@ -61,12 +73,13 @@ func (a *app) routes() http.Handler {
 	mux.HandleFunc("GET /api/current-week", a.currentWeek)
 	mux.HandleFunc("GET /api/week", a.week)
 	mux.HandleFunc("GET /api/month", a.month)
+	mux.HandleFunc("GET /api/watched", a.watched)
 	return mux
 }
 
 func (a *app) index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Write(indexHTML)
+	w.Write([]byte(strings.ReplaceAll(string(indexHTML), "{{WATCHED_BUTTON}}", html.EscapeString(a.labels.WatchedButton))))
 }
 
 func (a *app) currentWeek(w http.ResponseWriter, r *http.Request) {
@@ -147,6 +160,10 @@ func env(name, fallback string) string {
 func loadLabels() Labels {
 	defaults := DefaultLabels()
 	return Labels{
+		WatchedUpdate:  env("TEXT_WATCHED_UPDATE", defaults.WatchedUpdate),
+		NoWatchedItems: env("TEXT_NO_WATCHED_ITEMS", defaults.NoWatchedItems),
+		Users:          env("TEXT_USERS", defaults.Users),
+		WatchedButton:  env("TEXT_WATCHED_BUTTON", defaults.WatchedButton),
 		WeeklyUpdate:   env("TEXT_WEEKLY_UPDATE", defaults.WeeklyUpdate),
 		MonthlyUpdate:  env("TEXT_MONTHLY_UPDATE", defaults.MonthlyUpdate),
 		Movies:         env("TEXT_MOVIES", defaults.Movies),
@@ -166,4 +183,42 @@ func displayAddress(address string) string {
 		return "localhost" + address
 	}
 	return address
+}
+
+// watched uses the same calendar boundaries as the added-content reports.
+func (a *app) watched(w http.ResponseWriter, r *http.Request) {
+	now := a.now().In(a.location)
+	start, end := startOfWeek(now), now
+	period := r.URL.Query().Get("period")
+	switch period {
+	case "current-week":
+	case "week", "month":
+		offset, ok := readOffset(w, r)
+		if !ok {
+			return
+		}
+		if period == "week" {
+			start = start.AddDate(0, 0, offset*7)
+			end = start.AddDate(0, 0, 7)
+		} else {
+			start = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, a.location).AddDate(0, offset, 0)
+			end = start.AddDate(0, 1, 0)
+		}
+	default:
+		http.Error(w, "Invalid report period.", http.StatusBadRequest)
+		return
+	}
+	if a.jellystat == nil {
+		http.Error(w, "Configure JELLYSTAT_URL and JELLYSTAT_API_KEY to use watched reports.", http.StatusServiceUnavailable)
+		return
+	}
+	ctx, cancel := context.WithTimeout(r.Context(), 50*time.Second)
+	defer cancel()
+	titles, err := a.jellystat.WatchedBetween(ctx, start, end)
+	if err != nil {
+		log.Printf("Jellystat query failed: %v", err)
+		http.Error(w, "Could not query Jellystat. Check the server logs.", http.StatusBadGateway)
+		return
+	}
+	writeText(w, FormatWatched(start, end, period == "month", titles, a.labels))
 }
