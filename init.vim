@@ -121,6 +121,12 @@ vim.lsp.config('gopls', { capabilities = capabilities })
 vim.lsp.config('rust_analyzer', { capabilities = capabilities })
 vim.lsp.enable({ 'gopls', 'rust_analyzer' })
 
+-- Show diagnostic messages beside affected lines, with full details on demand.
+vim.diagnostic.config({ virtual_text = true })
+vim.keymap.set('n', '<leader>e', function()
+  vim.diagnostic.open_float({ scope = 'line' })
+end, { desc = 'Show line diagnostics' })
+
 vim.keymap.set('n', '<F6>', vim.lsp.buf.code_action)
 vim.keymap.set('n', 'K', vim.lsp.buf.hover)
 vim.keymap.set('n', 'KK', vim.lsp.buf.hover)
