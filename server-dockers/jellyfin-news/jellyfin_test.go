@@ -37,7 +37,7 @@ func TestAddedBetween(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(items) != 1 || items[0].Name != "New" {
+	if len(items) != 1 || items[0].Name != "New" || items[0].ID != "new" {
 		t.Fatalf("items = %#v", items)
 	}
 }

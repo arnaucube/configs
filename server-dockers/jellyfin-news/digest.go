@@ -9,6 +9,7 @@ import (
 
 // Item is the subset of Jellyfin item metadata needed by a digest.
 type Item struct {
+	ID             string
 	Type           string
 	Name           string
 	SeriesID       string

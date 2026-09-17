@@ -38,6 +38,7 @@ type response struct {
 }
 
 type item struct {
+	ID                string `json:"Id"`
 	Type              string `json:"Type"`
 	Name              string `json:"Name"`
 	SeriesID          string `json:"SeriesId"`
@@ -100,6 +101,7 @@ func (c *Client) AddedBetween(ctx context.Context, start, end time.Time) ([]Item
 				continue
 			}
 			result = append(result, Item{
+				ID:   raw.ID,
 				Type: raw.Type, Name: raw.Name, SeriesID: raw.SeriesID,
 				SeriesName: raw.SeriesName, SeasonNumber: raw.ParentIndexNumber,
 				EpisodeNumber: raw.IndexNumber, ProductionYear: raw.ProductionYear,

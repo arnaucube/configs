@@ -80,6 +80,8 @@ func (a *app) routes() http.Handler {
 	mux.HandleFunc("GET /api/week", a.week)
 	mux.HandleFunc("GET /api/month", a.month)
 	mux.HandleFunc("GET /api/watched", a.watched)
+	mux.HandleFunc("GET /api/posters", a.posters)
+	mux.HandleFunc("GET /api/poster/{id}", a.poster)
 	return mux
 }
 

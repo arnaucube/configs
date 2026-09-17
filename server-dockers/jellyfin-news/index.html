@@ -15,6 +15,8 @@
     textarea { box-sizing: border-box; width: 100%; min-height: 22rem; padding: 1rem; font: 15px/1.5 ui-monospace, monospace; resize: vertical; }
     [hidden] { display: none; }
     .copy { margin-top: .65rem; }
+    #collage-preview { display: block; max-width: 100%; height: auto; margin-top: 1rem; }
+    button:disabled { cursor: wait; }
   </style>
 </head>
 <body>
@@ -45,9 +47,14 @@
   <div class="controls">
     <button id="added">Newly added in selected period</button>
     <button id="watched">{{WATCHED_BUTTON}}</button>
+    <button id="posters">🖼 Generate poster image</button>
   </div>
 
   <p id="status" role="status"></p>
+  <div id="collage" hidden>
+    <a id="collage-download">Download PNG</a>
+    <img id="collage-preview" alt="Posters of movies and shows added in the selected period">
+  </div>
   <textarea id="output" readonly aria-label="Jellyfin update output" placeholder="Your recap will appear here"></textarea>
   <button id="copy" class="copy">Copy to clipboard</button>
 
@@ -56,6 +63,16 @@
     const output = document.querySelector('#output');
     const status = document.querySelector('#status');
     const controls = [...document.querySelectorAll('button, input, select')];
+    let collageURL;
+
+    // Release the previous export when the selection changes or a new image is requested.
+    function clearCollage() {
+      document.querySelector('#collage').hidden = true;
+      document.querySelector('#collage-preview').removeAttribute('src');
+      document.querySelector('#collage-download').removeAttribute('href');
+      if (collageURL) URL.revokeObjectURL(collageURL);
+      collageURL = null;
+    }
 
     async function loadReport(url) {
       controls.forEach(control => control.disabled = true);
@@ -79,6 +96,7 @@
       document.querySelector('#month-controls').hidden = period.value !== 'month';
       output.value = '';
       status.textContent = '';
+      clearCollage();
     }
     period.addEventListener('change', updatePeriod);
     document.querySelectorAll('input').forEach(input => input.addEventListener('input', updatePeriod));
@@ -98,6 +116,138 @@
     }
     document.querySelector('#added').addEventListener('click', () => generateReport(false));
     document.querySelector('#watched').addEventListener('click', () => generateReport(true));
+
+    // Missing artwork keeps its place in the collage with a labelled placeholder.
+    function loadPoster(url) {
+      return new Promise(resolve => {
+        if (!url) return resolve(null);
+        const image = new Image();
+        const timer = setTimeout(() => { image.src = ''; resolve(null); }, 35000);
+        image.onload = () => { clearTimeout(timer); resolve(image); };
+        image.onerror = () => { clearTimeout(timer); resolve(null); };
+        image.src = url;
+      });
+    }
+
+    // Wrap captions into two lines and ellipsize long titles without overflowing the tile.
+    function drawCaption(ctx, text, x, y, width) {
+      let remaining = text;
+      for (let line = 0; line < 2 && remaining; line++) {
+        let length = remaining.length;
+        while (length > 1 && ctx.measureText(remaining.slice(0, length) + (line === 1 && length < remaining.length ? '…' : '')).width > width) length--;
+        if (line === 0 && length < remaining.length) {
+          const space = remaining.lastIndexOf(' ', length);
+          if (space > 0) length = space;
+        }
+        ctx.fillText(remaining.slice(0, length) + (line === 1 && length < remaining.length ? '…' : ''), x, y + line * 23);
+        remaining = remaining.slice(length).trim();
+      }
+    }
+
+    // Draw in small batches, bounding concurrent requests and canvas memory for large months.
+    async function renderCollage(data) {
+      const columns = Math.min(6, Math.ceil(Math.sqrt(data.titles.length)));
+      const width = columns * 260 + 24;
+      const sections = new Map();
+      for (const title of data.titles) {
+        if (!sections.has(title.kind)) sections.set(title.kind, []);
+        sections.get(title.kind).push(title);
+      }
+      // Start each category on its own row beneath a single section heading.
+      const headings = [];
+      const tiles = [];
+      let height = 110;
+      for (const [kind, titles] of sections) {
+        headings.push({ kind, y: height + 26 });
+        height += 48;
+        titles.forEach((title, index) => tiles.push({
+          title,
+          x: 24 + (index % columns) * 260,
+          y: height + Math.floor(index / columns) * 420,
+        }));
+        height += Math.ceil(titles.length / columns) * 420 + 20;
+      }
+      const scale = Math.min(1, 8000 / height, Math.sqrt(16000000 / (width * height)));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.floor(width * scale));
+      canvas.height = Math.max(1, Math.floor(height * scale));
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Your browser could not create the poster image.');
+      ctx.scale(scale, scale);
+      ctx.fillStyle = '#101827';
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = 'bold 28px system-ui, sans-serif';
+      ctx.fillText(data.title, 24, 43, width - 48);
+      ctx.font = '18px system-ui, sans-serif';
+      ctx.fillStyle = '#b9c8dc';
+      ctx.fillText(`${data.start} – ${data.end}`, 24, 76, width - 48);
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = 'bold 24px system-ui, sans-serif';
+      for (const heading of headings) {
+        ctx.fillText(heading.kind, 24, heading.y, width - 48);
+      }
+      let missing = 0;
+      for (let start = 0; start < tiles.length; start += 4) {
+        const batch = tiles.slice(start, start + 4);
+        const images = await Promise.all(batch.map(tile => loadPoster(tile.title.url)));
+        batch.forEach(({ title, x, y }, offset) => {
+          const image = images[offset];
+          ctx.fillStyle = '#25334a';
+          ctx.fillRect(x, y, 236, 354);
+          if (image) {
+            const fit = Math.min(236 / image.naturalWidth, 354 / image.naturalHeight);
+            const w = image.naturalWidth * fit, h = image.naturalHeight * fit;
+            ctx.drawImage(image, x + (236 - w) / 2, y + (354 - h) / 2, w, h);
+          } else {
+            missing++;
+            ctx.fillStyle = '#b9c8dc';
+            ctx.font = '18px system-ui, sans-serif';
+            ctx.fillText('Poster unavailable', x + 20, y + 180);
+          }
+          ctx.fillStyle = '#f8fafc';
+          ctx.font = 'bold 18px system-ui, sans-serif';
+          drawCaption(ctx, title.name, x, y + 380, 236);
+        });
+        status.textContent = `Generating image… ${Math.min(start + 4, data.titles.length)}/${data.titles.length}`;
+      }
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      if (!blob) throw new Error('Could not export the image. Try a smaller period.');
+      return { blob, missing };
+    }
+
+    document.querySelector('#posters').addEventListener('click', async () => {
+      const params = new URLSearchParams({ period: period.value });
+      if (period.value !== 'current-week') {
+        const offset = document.querySelector(`#${period.value}-offset`);
+        if (!offset.reportValidity()) return;
+        params.set('offset', offset.value);
+      }
+      clearCollage();
+      controls.forEach(control => control.disabled = true);
+      status.textContent = 'Loading posters…';
+      try {
+        const response = await fetch(`/api/posters?${params}`, { headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error((await response.text()).trim() || `Request failed (${response.status})`);
+        const data = await response.json();
+        if (!data.titles.length) {
+          status.textContent = 'No new movies or show episodes in this period.';
+          return;
+        }
+        const { blob, missing } = await renderCollage(data);
+        collageURL = URL.createObjectURL(blob);
+        document.querySelector('#collage-preview').src = collageURL;
+        const download = document.querySelector('#collage-download');
+        download.href = collageURL;
+        download.download = `jellyfin-posters-${data.start}-${data.end}.png`;
+        document.querySelector('#collage').hidden = false;
+        status.textContent = `Image ready. Use Download PNG to save it.${missing ? ` ${missing} poster(s) unavailable; placeholders included.` : ''}`;
+      } catch (error) {
+        status.textContent = error.message;
+      } finally {
+        controls.forEach(control => control.disabled = false);
+      }
+    });
 
     document.querySelector('#copy').addEventListener('click', async () => {
       if (!output.value) return;
