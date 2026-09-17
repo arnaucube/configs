@@ -31,15 +31,17 @@ func NewJellystat(baseURL, apiKey string) (*JellystatClient, error) {
 }
 
 type playback struct {
-	UserID  string     `json:"UserId"`
-	ItemID  string     `json:"NowPlayingItemId"`
-	Date    string     `json:"ActivityDateInserted"`
-	Results []playback `json:"results"`
+	UserID       string     `json:"UserId"`
+	ItemID       string     `json:"NowPlayingItemId"`
+	Date         string     `json:"ActivityDateInserted"`
+	SeasonNumber *int       `json:"SeasonNumber"`
+	Results      []playback `json:"results"`
 }
 
 type WatchedTitle struct {
 	ID, Type, Name string
 	Users          int
+	Seasons        []int
 }
 
 // request keeps upstream bodies and connection details out of errors and logs.
@@ -74,6 +76,7 @@ func (c *JellystatClient) request(ctx context.Context, path string, body []byte,
 // to the latest play in each group and can hide earlier repeat viewings.
 func (c *JellystatClient) WatchedBetween(ctx context.Context, start, end time.Time) ([]WatchedTitle, error) {
 	users := map[string]map[string]bool{}
+	seasons := map[string]map[int]bool{}
 	fallback := map[string][]playback{}
 	for page := 1; ; page++ {
 		var response struct {
@@ -128,6 +131,12 @@ func (c *JellystatClient) WatchedBetween(ctx context.Context, start, end time.Ti
 					users[id] = map[string]bool{}
 				}
 				users[id][user] = true
+				if play.SeasonNumber != nil {
+					if seasons[id] == nil {
+						seasons[id] = map[int]bool{}
+					}
+					seasons[id][*play.SeasonNumber] = true
+				}
 			}
 		}
 		if page >= response.Pages {
@@ -151,7 +160,14 @@ func (c *JellystatClient) WatchedBetween(ctx context.Context, start, end time.Ti
 		if item.Type != "Movie" && item.Type != "Series" {
 			continue
 		}
-		titles = append(titles, WatchedTitle{id, item.Type, item.Name, len(viewers)})
+		title := WatchedTitle{ID: id, Type: item.Type, Name: item.Name, Users: len(viewers)}
+		if item.Type == "Series" {
+			for season := range seasons[id] {
+				title.Seasons = append(title.Seasons, season)
+			}
+			sort.Ints(title.Seasons)
+		}
+		titles = append(titles, title)
 	}
 	return titles, nil
 }
@@ -185,6 +201,11 @@ func (c *JellystatClient) itemHistory(ctx context.Context, id string, start, end
 
 // FormatWatched groups comma-separated titles without disclosing account identities.
 func FormatWatched(start, end time.Time, monthly bool, titles []WatchedTitle, labels Labels) string {
+	seasonPrefix := ""
+	for _, initial := range strings.TrimSpace(labels.Season) {
+		seasonPrefix = string(initial)
+		break
+	}
 	period := start.Format("2006-01-02") + " - " + end.Format("2006-01-02")
 	if monthly {
 		period = start.Format("2006-01")
@@ -215,6 +236,17 @@ func FormatWatched(start, end time.Time, monthly bool, titles []WatchedTitle, la
 				out.WriteString(", ")
 			}
 			out.WriteString(title.Name)
+			if title.Type == "Series" && len(title.Seasons) > 0 {
+				parts := make([]string, 0, len(title.Seasons))
+				for _, season := range title.Seasons {
+					label := fmt.Sprintf("%s%d", seasonPrefix, season)
+					if season == 0 {
+						label = labels.Specials
+					}
+					parts = append(parts, label)
+				}
+				fmt.Fprintf(&out, " (%s)", strings.Join(parts, ", "))
+			}
 			if title.Users > 1 {
 				fmt.Fprintf(&out, " (%d %s)", title.Users, labels.Users)
 			}

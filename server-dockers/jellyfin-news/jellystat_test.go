@@ -167,3 +167,82 @@ func TestWatchedTitlesInline(t *testing.T) {
 		t.Fatalf("got %q, want %q", got, want)
 	}
 }
+
+func TestWatchedSeasonsInSelectedPeriod(t *testing.T) {
+	for _, grouped := range []bool{true, false} {
+		t.Run(fmt.Sprintf("grouped=%t", grouped), func(t *testing.T) {
+			start := time.Date(2026, 8, 1, 0, 0, 0, 0, time.UTC)
+			end := start.AddDate(0, 1, 0)
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				var rows []playback
+				switch r.URL.Path {
+				case "/api/getHistory", "/api/getItemHistory":
+					if r.URL.Path == "/api/getHistory" && !grouped {
+						fmt.Fprint(w, `{"pages":1,"results":[{"NowPlayingItemId":"show"}]}`)
+						return
+					}
+					switch r.URL.Query().Get("page") {
+					case "1":
+						rows = []playback{
+							{ItemID: "show", UserID: "a", Date: start.Format(time.RFC3339), SeasonNumber: intp(2)},
+							{ItemID: "show", UserID: "a", Date: start.Add(-time.Second).Format(time.RFC3339), SeasonNumber: intp(3)},
+						}
+					case "2":
+						rows = []playback{
+							{ItemID: "show", UserID: "a", Date: start.Format(time.RFC3339), SeasonNumber: intp(1)},
+							{ItemID: "show", UserID: "b", Date: start.Format(time.RFC3339), SeasonNumber: intp(2)},
+							{ItemID: "show", UserID: "a", Date: start.Format(time.RFC3339), SeasonNumber: intp(0)},
+							{ItemID: "show", UserID: "a", Date: start.Format(time.RFC3339)},
+							{ItemID: "show", UserID: "c", Date: end.Format(time.RFC3339), SeasonNumber: intp(4)},
+						}
+					default:
+						t.Error("unexpected page")
+					}
+					if grouped {
+						rows = []playback{{ItemID: "show", Results: rows}}
+					}
+					json.NewEncoder(w).Encode(map[string]any{"pages": 2, "results": rows})
+				case "/api/getItemDetails":
+					fmt.Fprint(w, `[{"Name":"Example","Type":"Series"}]`)
+				default:
+					t.Errorf("unexpected endpoint %s", r.URL.Path)
+				}
+			}))
+			defer server.Close()
+			client, _ := NewJellystat(server.URL, "test-key")
+			titles, err := client.WatchedBetween(context.Background(), start, end)
+			if err != nil {
+				t.Fatal(err)
+			}
+			labels := DefaultLabels()
+			labels.Season = "Temporada"
+			labels.Specials = "Especiales"
+			got := FormatWatched(start, end, true, titles, labels)
+			want := "2026-08 jellyfin watched recap:\n\nShows: Example (Especiales, T1, T2) (2 users)"
+			if got != want {
+				t.Fatalf("got %q, want %q", got, want)
+			}
+		})
+	}
+}
+
+func TestWatchedSeasonInitial(t *testing.T) {
+	for _, tc := range []struct{ season, want string }{
+		{"Season", "S3"},
+		{"Temporada", "T3"},
+		{"Época", "É3"},
+		{" Temporada ", "T3"},
+	} {
+		t.Run(tc.season, func(t *testing.T) {
+			labels := DefaultLabels()
+			labels.Season = tc.season
+			start := time.Date(2026, 8, 1, 0, 0, 0, 0, time.UTC)
+			titles := []WatchedTitle{{Name: "Example", Type: "Series", Seasons: []int{3}}}
+			got := FormatWatched(start, start.AddDate(0, 1, 0), true, titles, labels)
+			want := "2026-08 jellyfin watched recap:\n\nShows: Example (" + tc.want + ")"
+			if got != want {
+				t.Fatalf("got %q, want %q", got, want)
+			}
+		})
+	}
+}

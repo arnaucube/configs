@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -38,6 +39,7 @@ type response struct {
 }
 
 type item struct {
+	ID                string `json:"Id"`
 	Type              string `json:"Type"`
 	Name              string `json:"Name"`
 	SeriesID          string `json:"SeriesId"`
@@ -100,6 +102,7 @@ func (c *Client) AddedBetween(ctx context.Context, start, end time.Time) ([]Item
 				continue
 			}
 			result = append(result, Item{
+				ID:   raw.ID,
 				Type: raw.Type, Name: raw.Name, SeriesID: raw.SeriesID,
 				SeriesName: raw.SeriesName, SeasonNumber: raw.ParentIndexNumber,
 				EpisodeNumber: raw.IndexNumber, ProductionYear: raw.ProductionYear,
@@ -110,4 +113,42 @@ func (c *Client) AddedBetween(ctx context.Context, start, end time.Time) ([]Item
 		}
 	}
 	return result, nil
+}
+
+// FindPosterTitle returns an exact library match so a typed title cannot use unrelated artwork.
+func (c *Client) FindPosterTitle(ctx context.Context, kind, name string, year int) (string, error) {
+	params := url.Values{
+		"IncludeItemTypes": {kind},
+		"Recursive":        {"true"},
+		"SearchTerm":       {name},
+		"Limit":            {"50"},
+		"EnableImages":     {"false"},
+		"EnableUserData":   {"false"},
+	}
+	if c.userID != "" {
+		params.Set("UserId", c.userID)
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+"/Items?"+params.Encode(), nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("X-Emby-Token", c.apiKey)
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("search Jellyfin: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("Jellyfin search returned HTTP %d", resp.StatusCode)
+	}
+	var result response
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 1<<20)).Decode(&result); err != nil {
+		return "", fmt.Errorf("decode Jellyfin search: %w", err)
+	}
+	for _, item := range result.Items {
+		if item.Type == kind && strings.EqualFold(item.Name, name) && (year == 0 || item.ProductionYear != nil && *item.ProductionYear == year) {
+			return item.ID, nil
+		}
+	}
+	return "", nil
 }

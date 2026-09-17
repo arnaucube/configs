@@ -7,7 +7,9 @@ The page provides:
 - **Current week**: from the configured weekly boundary through now (Monday at 00:00 by default).
 - **Selected week**: `-1` means last week, `-2` means two weeks ago, and so on.
 - **Selected month**: `-1` means last month, `-2` means two months ago, and so on.
+- **Watched in selected period**: generates a Jellystat recap with watched seasons beside each show, for example `Andor (S1, S2)`. The prefix uses the first letter of `TEXT_SEASON`, so `TEXT_SEASON=Temporada` produces `T1, T2`. Seasons are included when available in playback history; season 0 is shown as `Specials`.
 - **Copy to clipboard**: copies the generated plain-text recap.
+- **Generate poster image**: previews a downloadable PNG collage for the selected week or month, with one poster per movie or show added during that period. Open **Add movies or shows to the poster image** to paste extra entries in the same `Movies:` / `Shows:` bullet format as a newly added recap. Extra titles are included only in the image; their artwork is matched by title (and movie year, when provided) against the Jellyfin library. Missing artwork gets a labelled placeholder. The automatic entries use Jellyfin's added date (`DateCreated`).
 
 Weekly output looks like:
 
@@ -55,5 +57,4 @@ set +a
 ./jellyfin-news
 ```
 
-The API key remains on the server and is never sent to the browser. The browser only receives formatted recap text. This app has no authentication, so keep port 8080 limited to your trusted home LAN and do not expose it directly to the internet.
-
+The API key remains on the server and is never sent to the browser. The browser receives recap text, poster metadata, and artwork proxied through this app. This app has no authentication, so keep port 8080 limited to your trusted home LAN and do not expose it directly to the internet.
