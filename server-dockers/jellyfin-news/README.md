@@ -1,10 +1,10 @@
 # Jellyfin update webpage
 
-A small Go web server for generating copyable Jellyfin movie and episode recaps. It provides both: newly added movies and shows, and recently watched movies and shows. It serves one embedded `index.html` page, a database, or third-party Go dependencies.
+A small Go web server for generating copyable Jellyfin movie and episode recaps. It serves one embedded `index.html` page, a database, or third-party Go dependencies.
 
 The page provides:
 
-- **Current week**: from Monday at 00:00 through now.
+- **Current week**: from the configured weekly boundary through now (Monday at 00:00 by default).
 - **Selected week**: `-1` means last week, `-2` means two weeks ago, and so on.
 - **Selected month**: `-1` means last month, `-2` means two months ago, and so on.
 - **Copy to clipboard**: copies the generated plain-text recap.

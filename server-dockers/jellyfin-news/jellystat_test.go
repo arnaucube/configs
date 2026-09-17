@@ -65,7 +65,7 @@ func TestJellystatHistoryRepeatsPaginationAndTypes(t *testing.T) {
 		t.Fatal(err)
 	}
 	got := FormatWatched(start, end, true, titles, DefaultLabels())
-	want := "2026-08 jellyfin watched recap:\n\nMovies:\n• movie — 2 users\n\nShows:\n• show"
+	want := "2026-08 jellyfin watched recap:\n\nMovies: movie (2 users)\n\nShows: show"
 	if got != want {
 		t.Fatalf("got %q, want %q", got, want)
 	}
@@ -150,5 +150,20 @@ func TestJellystatMissingGroupedHistory(t *testing.T) {
 	}
 	if len(titles) != 1 || titles[0].Users != 2 || pages != 2 {
 		t.Fatalf("titles=%v pages=%d", titles, pages)
+	}
+}
+
+func TestWatchedTitlesInline(t *testing.T) {
+	start := time.Date(2026, 8, 1, 0, 0, 0, 0, time.UTC)
+	titles := []WatchedTitle{
+		{Name: "Severance", Type: "Series", Users: 2},
+		{Name: "Dune", Type: "Movie", Users: 3},
+		{Name: "Arrival", Type: "Movie", Users: 1},
+		{Name: "Andor", Type: "Series", Users: 1},
+	}
+	got := FormatWatched(start, start.AddDate(0, 1, 0), true, titles, DefaultLabels())
+	want := "2026-08 jellyfin watched recap:\n\nMovies: Arrival, Dune (3 users)\n\nShows: Andor, Severance (2 users)"
+	if got != want {
+		t.Fatalf("got %q, want %q", got, want)
 	}
 }

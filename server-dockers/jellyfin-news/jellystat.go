@@ -183,7 +183,7 @@ func (c *JellystatClient) itemHistory(ctx context.Context, id string, start, end
 	}
 }
 
-// FormatWatched lists each title once without disclosing account identities.
+// FormatWatched groups comma-separated titles without disclosing account identities.
 func FormatWatched(start, end time.Time, monthly bool, titles []WatchedTitle, labels Labels) string {
 	period := start.Format("2006-01-02") + " - " + end.Format("2006-01-02")
 	if monthly {
@@ -209,13 +209,17 @@ func FormatWatched(start, end time.Time, monthly bool, titles []WatchedTitle, la
 				continue
 			}
 			if !heading {
-				fmt.Fprintf(&out, "\n%s:\n", section.label)
+				fmt.Fprintf(&out, "\n%s: ", section.label)
 				heading = true
+			} else {
+				out.WriteString(", ")
 			}
-			fmt.Fprintf(&out, "• %s", title.Name)
+			out.WriteString(title.Name)
 			if title.Users > 1 {
-				fmt.Fprintf(&out, " — %d %s", title.Users, labels.Users)
+				fmt.Fprintf(&out, " (%d %s)", title.Users, labels.Users)
 			}
+		}
+		if heading {
 			out.WriteByte('\n')
 		}
 	}

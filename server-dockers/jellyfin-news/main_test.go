@@ -24,9 +24,10 @@ func (f *fakeSource) AddedBetween(_ context.Context, start, end time.Time) ([]It
 
 func testApp(source *fakeSource) *app {
 	return &app{
-		jellyfin: source,
-		location: time.UTC,
-		labels:   DefaultLabels(),
+		weekStart: weekStart{day: time.Monday},
+		jellyfin:  source,
+		location:  time.UTC,
+		labels:    DefaultLabels(),
 		now: func() time.Time {
 			return time.Date(2026, 9, 2, 12, 0, 0, 0, time.UTC)
 		},
@@ -55,7 +56,7 @@ func TestStartOfWeekUsesMondayMidnight(t *testing.T) {
 	location := time.FixedZone("test", 2*60*60)
 	now := time.Date(2026, 9, 6, 23, 45, 0, 0, location) // Sunday
 	want := time.Date(2026, 8, 31, 0, 0, 0, 0, location)
-	if got := startOfWeek(now); !got.Equal(want) {
+	if got := (weekStart{day: time.Monday}).start(now); !got.Equal(want) {
 		t.Fatalf("startOfWeek() = %v, want %v", got, want)
 	}
 }
@@ -140,7 +141,7 @@ func TestWatchedPeriods(t *testing.T) {
 			a.jellystat = source
 			response := httptest.NewRecorder()
 			a.routes().ServeHTTP(response, httptest.NewRequest("GET", "/api/watched?"+tc.query, nil))
-			if response.Code != 200 || !strings.Contains(response.Body.String(), "Example — 2 users") {
+			if response.Code != 200 || !strings.Contains(response.Body.String(), "Example (2 users)") {
 				t.Fatalf("response: %d %s", response.Code, response.Body.String())
 			}
 			if source.start.Format(time.RFC3339) != tc.start || source.end.Format(time.RFC3339) != tc.end {
@@ -181,5 +182,88 @@ func TestWatchedButtonEscapesTranslation(t *testing.T) {
 	a.routes().ServeHTTP(response, httptest.NewRequest("GET", "/", nil))
 	if !strings.Contains(response.Body.String(), "&lt;Watch &amp; copy&gt;") {
 		t.Fatal("button translation not escaped")
+	}
+}
+
+func TestWeekStartSettings(t *testing.T) {
+	for _, tc := range []struct {
+		day, clock string
+		want       weekStart
+		valid      bool
+	}{
+		{"", "", weekStart{day: time.Monday}, true},
+		{"sUnDaY", "20:00", weekStart{day: time.Sunday, hour: 20}, true},
+		{"Friday", "19:30", weekStart{day: time.Friday, hour: 19, minute: 30}, true},
+		{"Funday", "20:00", weekStart{}, false},
+		{"Sunday", "24:00", weekStart{}, false},
+		{"Sunday", "20:60", weekStart{}, false},
+		{"Sunday", "8:00", weekStart{}, false},
+	} {
+		t.Run(tc.day+tc.clock, func(t *testing.T) {
+			t.Setenv("WEEK_START_DAY", tc.day)
+			t.Setenv("WEEK_START_TIME", tc.clock)
+			got, err := loadWeekStart()
+			if (err == nil) != tc.valid {
+				t.Fatalf("error = %v", err)
+			}
+			if tc.valid && got != tc.want {
+				t.Fatalf("got %+v, want %+v", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestSundayEveningWeekBoundary(t *testing.T) {
+	location, err := time.LoadLocation("Europe/London")
+	if err != nil {
+		t.Fatal(err)
+	}
+	boundary := weekStart{day: time.Sunday, hour: 20, minute: 30}
+	for _, tc := range []struct{ now, want string }{
+		{"2026-09-06T20:29:59+01:00", "2026-08-30T20:30:00+01:00"},
+		{"2026-09-06T20:30:00+01:00", "2026-09-06T20:30:00+01:00"},
+		{"2026-09-07T01:00:00+01:00", "2026-09-06T20:30:00+01:00"},
+		{"2026-03-29T19:00:00+01:00", "2026-03-22T20:30:00Z"},
+		{"2026-10-25T19:00:00Z", "2026-10-18T20:30:00+01:00"},
+	} {
+		now, _ := time.Parse(time.RFC3339, tc.now)
+		if got := boundary.start(now.In(location)).Format(time.RFC3339); got != tc.want {
+			t.Fatalf("at %s got %s, want %s", tc.now, got, tc.want)
+		}
+	}
+}
+
+func TestCustomWeekBothReportTypes(t *testing.T) {
+	for _, period := range []string{"current-week", "week", "month"} {
+		for _, watched := range []bool{false, true} {
+			added := &fakeSource{}
+			viewed := &fakeWatched{}
+			a := testApp(added)
+			a.jellystat = viewed
+			a.weekStart = weekStart{day: time.Sunday, hour: 20}
+			path := "/api/" + period + "?offset=-1"
+			if watched {
+				path = "/api/watched?period=" + period + "&offset=-1"
+			}
+			response := httptest.NewRecorder()
+			a.routes().ServeHTTP(response, httptest.NewRequest("GET", path, nil))
+			if response.Code != 200 {
+				t.Fatalf("%s: %d", path, response.Code)
+			}
+			start, end := added.start, added.end
+			if watched {
+				start, end = viewed.start, viewed.end
+			}
+			wantStart, wantEnd := "2026-08-30T20:00:00Z", "2026-09-02T12:00:00Z"
+			if period == "week" {
+				wantStart, wantEnd = "2026-08-23T20:00:00Z", "2026-08-30T20:00:00Z"
+			}
+			if period == "month" {
+				wantStart, wantEnd = "2026-08-01T00:00:00Z", "2026-09-01T00:00:00Z"
+			}
+			if start.Format(time.RFC3339) != wantStart || end.Format(time.RFC3339) != wantEnd {
+				t.Fatalf("%s: %v to %v", path, start, end)
+			}
+		}
 	}
 }

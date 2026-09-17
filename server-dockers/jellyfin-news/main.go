@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"errors"
 	"flag"
+	"fmt"
 	"html"
 	"log"
 	"net/http"
@@ -26,6 +27,7 @@ type watchedSource interface {
 }
 
 type app struct {
+	weekStart weekStart
 	jellystat watchedSource
 	jellyfin  itemSource
 	location  *time.Location
@@ -41,12 +43,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("invalid TZ: %v", err)
 	}
+	week, err := loadWeekStart()
+	if err != nil {
+		log.Fatal(err)
+	}
 	client, err := New(os.Getenv("JELLYFIN_URL"), os.Getenv("JELLYFIN_API_KEY"), os.Getenv("JELLYFIN_USER_ID"), nil)
 	if err != nil {
 		log.Fatalf("configuration error: %v", err)
 	}
 
-	application := &app{jellyfin: client, location: location, labels: loadLabels(), now: time.Now}
+	application := &app{weekStart: week, jellyfin: client, location: location, labels: loadLabels(), now: time.Now}
 	if baseURL := os.Getenv("JELLYSTAT_URL"); strings.TrimSpace(baseURL) != "" {
 		application.jellystat, err = NewJellystat(baseURL, os.Getenv("JELLYSTAT_API_KEY"))
 		if err != nil {
@@ -84,7 +90,7 @@ func (a *app) index(w http.ResponseWriter, r *http.Request) {
 
 func (a *app) currentWeek(w http.ResponseWriter, r *http.Request) {
 	now := a.now().In(a.location)
-	start := startOfWeek(now)
+	start := a.weekStart.start(now)
 	a.writeWeek(w, r, start, now)
 }
 
@@ -93,7 +99,7 @@ func (a *app) week(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	currentWeek := startOfWeek(a.now().In(a.location))
+	currentWeek := a.weekStart.start(a.now().In(a.location))
 	start := currentWeek.AddDate(0, 0, offset*7)
 	a.writeWeek(w, r, start, start.AddDate(0, 0, 7))
 }
@@ -145,9 +151,44 @@ func readOffset(w http.ResponseWriter, r *http.Request) (int, bool) {
 	return offset, true
 }
 
-func startOfWeek(now time.Time) time.Time {
-	daysSinceMonday := (int(now.Weekday()) - int(time.Monday) + 7) % 7
-	return time.Date(now.Year(), now.Month(), now.Day()-daysSinceMonday, 0, 0, 0, 0, now.Location())
+// weekStart defines a weekly boundary in the report's local timezone.
+type weekStart struct {
+	day          time.Weekday
+	hour, minute int
+}
+
+// loadWeekStart rejects invalid settings rather than silently changing report periods.
+func loadWeekStart() (weekStart, error) {
+	day := env("WEEK_START_DAY", "Monday")
+	clock := env("WEEK_START_TIME", "00:00")
+	var result weekStart
+	found := false
+	for d := time.Sunday; d <= time.Saturday; d++ {
+		if strings.EqualFold(day, d.String()) {
+			result.day = d
+			found = true
+			break
+		}
+	}
+	if !found {
+		return result, fmt.Errorf("WEEK_START_DAY must be a full weekday name (Monday through Sunday)")
+	}
+	parsed, err := time.Parse("15:04", clock)
+	if err != nil || parsed.Format("15:04") != clock {
+		return result, fmt.Errorf("WEEK_START_TIME must be HH:MM in 24-hour format")
+	}
+	result.hour, result.minute = parsed.Hour(), parsed.Minute()
+	return result, nil
+}
+
+// start finds the latest weekly boundary, including before today's start time.
+func (w weekStart) start(now time.Time) time.Time {
+	days := (int(now.Weekday()) - int(w.day) + 7) % 7
+	boundary := time.Date(now.Year(), now.Month(), now.Day()-days, w.hour, w.minute, 0, 0, now.Location())
+	if boundary.After(now) {
+		boundary = boundary.AddDate(0, 0, -7)
+	}
+	return boundary
 }
 
 func env(name, fallback string) string {
@@ -188,7 +229,7 @@ func displayAddress(address string) string {
 // watched uses the same calendar boundaries as the added-content reports.
 func (a *app) watched(w http.ResponseWriter, r *http.Request) {
 	now := a.now().In(a.location)
-	start, end := startOfWeek(now), now
+	start, end := a.weekStart.start(now), now
 	period := r.URL.Query().Get("period")
 	switch period {
 	case "current-week":
