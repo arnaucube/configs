@@ -1,30 +1,8 @@
 #!/usr/bin/env bash
 #
-# Launch LXC containers to work in there.
-
-# Needs: sudo snap install lxd
-# initialize lxd: sudo lxd init --auto
-
-# NOTE: in case the container does not have internet:
-# 1)
-# sudo sysctl -w net.ipv4.ip_forward=1
+# Launch Inucs containers to work in there.
 #
-# 2) (at the host machine)
-# # Force iptables to ACCEPT traffic from the LXD bridge 
-# # Docker sets the global policy to DROP; we must explicitly allow lxdbr0
-# sudo iptables -I FORWARD -i lxdbr0 -j ACCEPT
-# sudo iptables -I FORWARD -o lxdbr0 -j ACCEPT
-#
-# 3)
-# # allow LXD bridge through firewall:
-# sudo ufw allow in on lxdbr0
-# sudo ufw route allow in on lxdbr0
-# sudo ufw route allow out on lxdbr0
-#
-# Note: when turning off and on the host machine, might need to set the iptables
-# again: step 2).
-
-# Incus version:
+# Steps to do before first run on a new machine:
 #
 # sudo incus admin init
 #
@@ -46,7 +24,6 @@ if [ -z "$1" ]; then
 fi
 
 # Choose which container manager to use:
-#MNGR="lxc"
 MNGR="sudo incus"
 
 CONTAINER_NAME="$1"
@@ -82,14 +59,12 @@ if ! declare -f "profile_$PROFILE_NAME" > /dev/null; then
 fi
 
 echo "profile selected: [$PROFILE_NAME]"
-# echo "software to install: $SOFTWARE_LIST"
 
 mkdir -p "$HOST_SHARE_DIR"
 
 echo "launch LXD container: $CONTAINER_NAME..."
 # security.nesting=true allows Docker to run inside this container
 $MNGR launch "$IMAGE" "$CONTAINER_NAME" -c security.nesting=true
-# $MNGR launch "$IMAGE" "$CONTAINER_NAME" -c security.nesting=true
 
 sleep 2 # wait for filesystem
 
