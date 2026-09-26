@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Launch Inucs containers to work in there.
+# Launch Incus containers to work in there.
 #
 # Steps to do before first run on a new machine:
 #
@@ -17,7 +17,7 @@
 
 set -e
 
-if [ -z "$1" ]; then
+if [ -z "${1:-}" ]; then
     echo "Error: no container name provided."
     echo "Usage: box <container_name> <profile_name(optional)>"
     exit 1
@@ -26,13 +26,20 @@ fi
 # Choose which container manager to use:
 MNGR="sudo incus"
 
+# dev user with same permission levels as host user
+DEV_USER="dev"
+HOST_USER="${SUDO_USER:-$USER}"
+HOST_UID=$(id -u "$HOST_USER")
+HOST_GID=$(id -g "$HOST_USER")
+HOST_HOME=$(getent passwd "$HOST_USER" | cut -d: -f6)
+
 CONTAINER_NAME="$1"
-HOST_SHARE_DIR="/home/$USER/container_data/$CONTAINER_NAME"
+HOST_SHARE_DIR="$HOST_HOME/container_data/$CONTAINER_NAME"
 CONTAINER_SHARE_DIR="/mnt/shared"
 IMAGE="images:ubuntu/24.04"
 
 PROFILE_NAME=${2:-"default"} # if $2 is empty, use "default"
-PROFILES_FILE="$HOME/bin/box_profiles.sh"
+PROFILES_FILE="$HOST_HOME/bin/box_profiles.sh"
 
 # EXPOSE_PORTS="7000 7001 7002 7003 7004 7005 7006 7007 7008 7009 7010"
 EXPOSE_PORTS=""
@@ -58,69 +65,278 @@ if ! declare -f "profile_$PROFILE_NAME" > /dev/null; then
     exit 1
 fi
 
+if $MNGR info "$CONTAINER_NAME" > /dev/null 2>&1; then
+    echo "error: container '$CONTAINER_NAME' already exists."
+    exit 1
+fi
+
 echo "profile selected: [$PROFILE_NAME]"
 
 mkdir -p "$HOST_SHARE_DIR"
 
-echo "launch LXD container: $CONTAINER_NAME..."
+echo "launch Incus container: $CONTAINER_NAME..."
 # security.nesting=true allows Docker to run inside this container
 $MNGR launch "$IMAGE" "$CONTAINER_NAME" -c security.nesting=true
 
-sleep 2 # wait for filesystem
+echo "wait for container"
+for _ in $(seq 1 30); do
+    if $MNGR exec "$CONTAINER_NAME" -- true > /dev/null 2>&1; then
+        break
+    fi
+    sleep 1
+done
 
-echo "set dns"
-HOST_UID=$(id -u)
-# map Host User to Container Root
-# $MNGR config set "$CONTAINER_NAME" raw.idmap "both $HOST_UID 0"
-# set dns to bypass host dns
-#$MNGR exec "$CONTAINER_NAME" -- rm -f /etc/resolv.conf
-#$MNGR exec "$CONTAINER_NAME" -- bash -c "echo 'nameserver 8.8.8.8' | tee /etc/resolv.conf"
+if ! $MNGR exec "$CONTAINER_NAME" -- true > /dev/null 2>&1; then
+    echo "error: container did not become ready."
+    $MNGR delete -f "$CONTAINER_NAME"
+    exit 1
+fi
 
-echo "restart container"
-$MNGR restart "$CONTAINER_NAME"
-$MNGR exec "$CONTAINER_NAME" -- true
+echo "configure non-root development user"
+$MNGR exec "$CONTAINER_NAME" \
+    --env DEV_USER="$DEV_USER" \
+    --env HOST_UID="$HOST_UID" \
+    --env HOST_GID="$HOST_GID" \
+    -- bash -s <<'IN_CONTAINER'
+
+set -e
+
+# Find whether the desired UID already exists.
+EXISTING_USER=$(getent passwd "$HOST_UID" | cut -d: -f1 || true)
+
+if [ -n "$EXISTING_USER" ] && [ "$EXISTING_USER" != "$DEV_USER" ]; then
+    echo "renaming existing UID $HOST_UID user $EXISTING_USER -> $DEV_USER"
+
+    usermod -l "$DEV_USER" "$EXISTING_USER"
+
+elif [ -z "$EXISTING_USER" ]; then
+    echo "creating user $DEV_USER with UID $HOST_UID"
+
+    useradd \
+        -m \
+        -u "$HOST_UID" \
+        -s /bin/bash \
+        "$DEV_USER"
+fi
+
+# Move the user home to /home/dev.
+OLD_HOME=$(getent passwd "$DEV_USER" | cut -d: -f6)
+NEW_HOME="/home/$DEV_USER"
+
+if [ "$OLD_HOME" != "$NEW_HOME" ]; then
+    if [ -e "$NEW_HOME" ]; then
+        # In case the target directory already exists, copy the old home
+        # contents and point the user to the new location.
+        if [ -d "$OLD_HOME" ]; then
+            cp -a "$OLD_HOME"/. "$NEW_HOME"/
+        fi
+
+        usermod -d "$NEW_HOME" "$DEV_USER"
+    else
+        usermod -d "$NEW_HOME" -m "$DEV_USER"
+    fi
+fi
+
+usermod -s /bin/bash "$DEV_USER"
+
+# Match host primary GID as well.
+GROUP_NAME=$(getent group "$HOST_GID" | cut -d: -f1 || true)
+
+if [ -z "$GROUP_NAME" ]; then
+    groupadd -g "$HOST_GID" hostusers
+    GROUP_NAME=hostusers
+fi
+
+usermod -g "$GROUP_NAME" "$DEV_USER"
+
+# Make sure home belongs to dev.
+mkdir -p "/home/$DEV_USER"
+chown -R "$HOST_UID:$HOST_GID" "/home/$DEV_USER"
+chmod 755 "/home/$DEV_USER"
+
+echo "configured user:"
+id "$DEV_USER"
+
+IN_CONTAINER
 
 echo "configure shared directory (between container & host)"
 $MNGR config device add "$CONTAINER_NAME" project_storage disk \
     source="$HOST_SHARE_DIR" \
     path="$CONTAINER_SHARE_DIR"
 
+# shift=true maps the shared directory permissions between host and container
+$MNGR config device set "$CONTAINER_NAME" project_storage shift=true
+
 echo "configure port forwarding"
 for PORT in $EXPOSE_PORTS; do
     $MNGR config device add "$CONTAINER_NAME" "proxy${PORT}" proxy \
-        listen=tcp:0.0.0.0:${PORT} \
-        connect=tcp:127.0.0.1:${PORT}
+        listen="tcp:0.0.0.0:${PORT}" \
+        connect="tcp:127.0.0.1:${PORT}"
 done
 
+echo "wait for network"
+NETWORK_READY=false
+for _ in $(seq 1 30); do
+    if $MNGR exec "$CONTAINER_NAME" -- \
+        sh -c 'ip -4 route show default | grep -q "^default "'; then
+        NETWORK_READY=true
+        break
+    fi
 
-$MNGR config device set $CONTAINER_NAME project_storage shift true
+    sleep 1
+done
+if [ "$NETWORK_READY" != "true" ]; then
+    echo "error: container did not get a default IPv4 route."
+    echo "network state:"
+    $MNGR exec "$CONTAINER_NAME" -- ip addr || true
+    $MNGR exec "$CONTAINER_NAME" -- ip route || true
+    exit 1
+fi
 
 echo "check internet"
-if ! $MNGR exec "$CONTAINER_NAME" -- ping -c 1 8.8.8.8 > /dev/null; then
-    echo "error: no internet access inside the container."
-    echo "note: check out the 'NOTE' at the top of the script for instructions."
-    # remove container, since failed the launch
-    $MNGR stop $CONTAINER_NAME
-    $MNGR delete $CONTAINER_NAME
+INTERNET_READY=false
+for _ in $(seq 1 10); do
+    if $MNGR exec "$CONTAINER_NAME" -- ping -c 1 -W 2 8.8.8.8 > /dev/null 2>&1; then
+        INTERNET_READY=true
+        break
+    fi
+
+    sleep 1
+done
+if [ "$INTERNET_READY" != "true" ]; then
+    echo "error: container has a network route but no internet access."
+    echo "network state:"
+    $MNGR exec "$CONTAINER_NAME" -- ip addr || true
+    $MNGR exec "$CONTAINER_NAME" -- ip route || true
     exit 1
 fi
 
 echo "apt update & apt install"
-$MNGR exec "$CONTAINER_NAME" -- bash -c "
-    $(cat "$PROFILES_FILE")
+{
+    # Load the profile functions inside the container.
+    cat "$PROFILES_FILE"
 
-    export DEBIAN_FRONTEND=noninteractive
-    export NEEDRESTART_MODE=a # 'a' for automatic restart
+    cat <<'IN_CONTAINER'
 
-    apt-get update && apt-get upgrade -y
+set -e
 
-    if declare -f profile_$PROFILE_NAME > /dev/null; then
-        profile_$PROFILE_NAME
-    else
-        echo 'error: profile function $PROFILE_NAME not found.'
-        exit 1
-    fi
-"
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a # 'a' for automatic restart
+
+apt-get update
+apt-get install -y sudo
+apt-get upgrade -y
+
+# give user 'dev' sudo access
+usermod -aG sudo "$DEV_USER"
+
+printf '%s\n' "$DEV_USER ALL=(ALL) NOPASSWD:ALL" \
+    > "/etc/sudoers.d/$DEV_USER"
+
+chmod 0440 "/etc/sudoers.d/$DEV_USER"
+
+if declare -f "profile_$PROFILE_NAME" > /dev/null; then
+    "profile_$PROFILE_NAME"
+else
+    echo "error: profile function $PROFILE_NAME not found."
+    exit 1
+fi
+
+# profile_docker might have created the docker group
+if getent group docker > /dev/null; then
+    usermod -aG docker "$DEV_USER"
+fi
+
+IN_CONTAINER
+
+} | $MNGR exec "$CONTAINER_NAME" \
+    --env DEV_USER="$DEV_USER" \
+    --env PROFILE_NAME="$PROFILE_NAME" \
+    -- bash -s
+
+echo "configure development environment as $DEV_USER"
+$MNGR exec "$CONTAINER_NAME" \
+    -- su -l "$DEV_USER" -c 'bash -s' <<'IN_DEV'
+
+set -e
+
+cd "$HOME"
+
+if [ ! -d "$HOME/configs/.git" ]; then
+    git clone https://github.com/arnaucube/configs.git "$HOME/configs"
+fi
+
+cd "$HOME/configs"
+
+# yes | bash install-new-server.sh
+
+IN_DEV
+
+echo "configure npm global packages as $DEV_USER"
+$MNGR exec "$CONTAINER_NAME" \
+    -- su -l "$DEV_USER" -c 'bash -s' <<'IN_DEV'
+
+set -e
+
+mkdir -p "$HOME/.local"
+
+# install global npm packages under the dev home instead of /usr/lib
+npm config set prefix "$HOME/.local"
+
+PATH_LINE='export PATH="$HOME/.local/bin:$PATH"'
+
+if ! grep -qxF "$PATH_LINE" "$HOME/.bashrc" 2>/dev/null; then
+    echo "$PATH_LINE" >> "$HOME/.bashrc"
+fi
+
+export PATH="$HOME/.local/bin:$PATH"
+
+IN_DEV
+
+echo "configure shared directory permissions"
+
+# Make existing files in the shared directory belong to the host/dev user.
+sudo chown -R "$HOST_UID:$HOST_GID" "$HOST_SHARE_DIR"
+
+# directories: rwxr-xr-x
+find "$HOST_SHARE_DIR" \
+    -type d \
+    -exec chmod 755 {} +
+
+# normal files: rw-r--r--
+find "$HOST_SHARE_DIR" \
+    -type f \
+    ! -perm /111 \
+    -exec chmod 644 {} +
+
+# preserve executable files as executable
+find "$HOST_SHARE_DIR" \
+    -type f \
+    -perm /111 \
+    -exec chmod 755 {} +
+
+echo "configure Incus shell to use non-root user"
+
+# This alias is global for the current Incus client.
+# Containers entered with `incus shell` are expected to have the dev user.
+$MNGR alias remove shell > /dev/null 2>&1 || true
+$MNGR alias add shell "exec @ARGS@ -- su -l $DEV_USER"
+
+echo "check configuration"
+$MNGR exec "$CONTAINER_NAME" \
+    -- su -l "$DEV_USER" -c '
+        echo "user: $(whoami)"
+        echo "home: $HOME"
+        echo "uid/gid: $(id)"
+        echo "working directory: $(pwd)"
+    '
+
+echo "check shared directory permissions"
+$MNGR exec "$CONTAINER_NAME" \
+    -- su -l "$DEV_USER" -c '
+        touch /mnt/shared/.box-permission-test
+        rm /mnt/shared/.box-permission-test
+    '
 
 echo "setup complete"
 echo "----------------------------------------------------"
@@ -128,5 +344,6 @@ echo "Shared Directory (Host): $HOST_SHARE_DIR"
 echo "Shared Directory (Container): $CONTAINER_SHARE_DIR"
 echo "----------------------------------------------------"
 echo "To enter the container, run: $MNGR shell $CONTAINER_NAME"
+echo "To enter as root, run: $MNGR exec $CONTAINER_NAME -- bash"
 echo "To stop the container, run: $MNGR stop $CONTAINER_NAME"
 echo "To remove the container, run: $MNGR delete $CONTAINER_NAME"
