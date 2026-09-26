@@ -9,7 +9,7 @@
 # 1)
 # sudo sysctl -w net.ipv4.ip_forward=1
 #
-# 2)
+# 2) (at the host machine)
 # # Force iptables to ACCEPT traffic from the LXD bridge 
 # # Docker sets the global policy to DROP; we must explicitly allow lxdbr0
 # sudo iptables -I FORWARD -i lxdbr0 -j ACCEPT
@@ -22,21 +22,37 @@
 # sudo ufw route allow out on lxdbr0
 #
 # Note: when turning off and on the host machine, might need to set the iptables
-# again: step 3).
+# again: step 2).
 
+# Incus version:
+#
+# sudo incus admin init
+#
+# then download the ubuntu image:
+# sudo incus launch images:ubuntu/24.04 test
+#
+# - create a managed network bridge:
+# incus network create incusbr0 ipv4.address=auto ipv4.nat=true ipv6.address=none
+# incus profile device set default eth0 network incusbr0
+#
+#
 
 set -e
 
 if [ -z "$1" ]; then
     echo "Error: no container name provided."
-    echo "Usage: ./box.sh <container_name>"
+    echo "Usage: box <container_name> <profile_name(optional)>"
     exit 1
 fi
+
+# Choose which container manager to use:
+#MNGR="lxc"
+MNGR="sudo incus"
 
 CONTAINER_NAME="$1"
 HOST_SHARE_DIR="/home/$USER/container_data/$CONTAINER_NAME"
 CONTAINER_SHARE_DIR="/mnt/shared"
-IMAGE="ubuntu:22.04"
+IMAGE="images:ubuntu/24.04"
 
 PROFILE_NAME=${2:-"default"} # if $2 is empty, use "default"
 PROFILES_FILE="$HOME/bin/box_profiles.sh"
@@ -66,52 +82,56 @@ if ! declare -f "profile_$PROFILE_NAME" > /dev/null; then
 fi
 
 echo "profile selected: [$PROFILE_NAME]"
-echo "software to install: $SOFTWARE_LIST"
+# echo "software to install: $SOFTWARE_LIST"
 
 mkdir -p "$HOST_SHARE_DIR"
 
 echo "launch LXD container: $CONTAINER_NAME..."
 # security.nesting=true allows Docker to run inside this container
-lxc launch "$IMAGE" "$CONTAINER_NAME" -c security.nesting=true
+$MNGR launch "$IMAGE" "$CONTAINER_NAME" -c security.nesting=true
+# $MNGR launch "$IMAGE" "$CONTAINER_NAME" -c security.nesting=true
 
 sleep 2 # wait for filesystem
 
 echo "set dns"
 HOST_UID=$(id -u)
 # map Host User to Container Root
-lxc config set "$CONTAINER_NAME" raw.idmap "both $HOST_UID 0"
+# $MNGR config set "$CONTAINER_NAME" raw.idmap "both $HOST_UID 0"
 # set dns to bypass host dns
-lxc exec "$CONTAINER_NAME" -- rm -f /etc/resolv.conf
-lxc exec "$CONTAINER_NAME" -- bash -c "echo 'nameserver 8.8.8.8' | tee /etc/resolv.conf"
+#$MNGR exec "$CONTAINER_NAME" -- rm -f /etc/resolv.conf
+#$MNGR exec "$CONTAINER_NAME" -- bash -c "echo 'nameserver 8.8.8.8' | tee /etc/resolv.conf"
 
-echo "restart container, sleep 2s"
-lxc restart "$CONTAINER_NAME"
-sleep 2
+echo "restart container"
+$MNGR restart "$CONTAINER_NAME"
+$MNGR exec "$CONTAINER_NAME" -- true
 
 echo "configure shared directory (between container & host)"
-lxc config device add "$CONTAINER_NAME" project_storage disk \
+$MNGR config device add "$CONTAINER_NAME" project_storage disk \
     source="$HOST_SHARE_DIR" \
     path="$CONTAINER_SHARE_DIR"
 
 echo "configure port forwarding"
 for PORT in $EXPOSE_PORTS; do
-    lxc config device add "$CONTAINER_NAME" "proxy${PORT}" proxy \
+    $MNGR config device add "$CONTAINER_NAME" "proxy${PORT}" proxy \
         listen=tcp:0.0.0.0:${PORT} \
         connect=tcp:127.0.0.1:${PORT}
 done
 
+
+$MNGR config device set $CONTAINER_NAME project_storage shift true
+
 echo "check internet"
-if ! lxc exec "$CONTAINER_NAME" -- ping -c 1 8.8.8.8 > /dev/null; then
+if ! $MNGR exec "$CONTAINER_NAME" -- ping -c 1 8.8.8.8 > /dev/null; then
     echo "error: no internet access inside the container."
     echo "note: check out the 'NOTE' at the top of the script for instructions."
     # remove container, since failed the launch
-    lxc stop $CONTAINER_NAME
-    lxc delete $CONTAINER_NAME
+    $MNGR stop $CONTAINER_NAME
+    $MNGR delete $CONTAINER_NAME
     exit 1
 fi
 
 echo "apt update & apt install"
-lxc exec "$CONTAINER_NAME" -- bash -c "
+$MNGR exec "$CONTAINER_NAME" -- bash -c "
     $(cat "$PROFILES_FILE")
 
     export DEBIAN_FRONTEND=noninteractive
@@ -132,6 +152,6 @@ echo "----------------------------------------------------"
 echo "Shared Directory (Host): $HOST_SHARE_DIR"
 echo "Shared Directory (Container): $CONTAINER_SHARE_DIR"
 echo "----------------------------------------------------"
-echo "To enter the container, run: lxc shell $CONTAINER_NAME"
-echo "To stop the container, run: lxc stop $CONTAINER_NAME"
-echo "To remove the container, run: lxc delete $CONTAINER_NAME"
+echo "To enter the container, run: $MNGR shell $CONTAINER_NAME"
+echo "To stop the container, run: $MNGR stop $CONTAINER_NAME"
+echo "To remove the container, run: $MNGR delete $CONTAINER_NAME"
