@@ -47,9 +47,9 @@ cat .bashrc >> ~/.bashrc
 source .bashrc
 
 # # go
-# echo "installing go 1.24.3"
-# wget https://golang.org/dl/go1.24.3.linux-amd64.tar.gz
-# tar -C /usr/local -xzf go1.24.3.linux-amd64.tar.gz
+# echo "installing go 1.27.1"
+# wget https://golang.org/dl/go1.27.1.linux-amd64.tar.gz
+# tar -C /usr/local -xzf go1.27.1.linux-amd64.tar.gz
 # 
 # # nodejs
 # echo "installing nodejs v16"

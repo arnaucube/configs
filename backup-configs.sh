@@ -14,3 +14,6 @@ cp ~/.config/sway/status.sh ./sway/status.sh
 mkdir -p alacritty
 cp ~/.config/alacritty/alacritty.toml ./alacritty/alacritty.toml
 
+mkdir -p bin
+cp ~/bin/box ./bin/box
+cp ~/bin/box_profiles.sh ./bin/box_profiles.sh

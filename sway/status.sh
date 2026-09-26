@@ -24,6 +24,9 @@ datetime=$(date "+%a %F %H:%M:%S")
 
 interface=$(ip route get 8.8.8.8 | awk -F'dev ' 'NR==1{split($2,a," ");print a[1]}')
 ip=$(ip addr show dev $interface | grep 'inet ' | awk '{print $2}' | cut -d'/' -f1)
+wifi_name=$(nmcli -g GENERAL.CONNECTION dev show "$interface")
+
+
 
 avail_space=$(df -h / | awk 'NR==2 {print $4}')
 
@@ -31,4 +34,4 @@ avail_space=$(df -h / | awk 'NR==2 {print $4}')
 
 
 # 💎 💻 💡 🔌 ⚡ 📁 \| 🐧 🔊 🔋
-echo $avail_space \| $temp°C \| $uptime_formatted \| vol: $volume $muted \| $battery_status $battery_capacity% \| $interface $ip \| $datetime
+echo $avail_space \| $temp°C \| $uptime_formatted \| vol: $volume $muted \| $battery_status $battery_capacity% \| $wifi_name \| $interface $ip \| $datetime
