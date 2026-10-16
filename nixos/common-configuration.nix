@@ -96,6 +96,7 @@
     pdfgrep
     keynav
     screenfetch
+    libnotify
 
     # Editors and terminals
     neovim
@@ -124,9 +125,11 @@
     gimp
     calibre
     tauon
+    jellyfin-tui
     kdePackages.kdenlive
     libreoffice-qt6
     ffmpeg
+    libavif # for converting avif imgs (for link2epub)
 
     # Browsers
     firefox

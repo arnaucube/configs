@@ -42,6 +42,17 @@ output DP-2 resolution 1920x1200 position 1920 0
 #     transform 270
 # }
 
+
+# move current workspace to another display
+# bindsym $mod+Control+k move workspace to output HDMI-A-1
+# bindsym $mod+Control+j move workspace to output eDP-1
+# bindsym $mod+Control+j move workspace to output DP-1
+# bindsym $mod+Control+k move workspace to output eDP-1
+# bindsym $mod+Control+k move workspace to output DP-1
+bindsym $mod+Control+j move workspace to output DSI-1
+bindsym $mod+Control+k move workspace to output DP-1
+
+
 ### Idle configuration
 #
 # Example configuration:
@@ -250,15 +261,6 @@ default_border pixel 1
 bindsym $mod+Control+b exec sed -i 's/\"Regular\"#tag_for_shortcut/\"Bold\"#tag_for_shortcut/g' ~/.config/alacritty/alacritty.toml
 bindsym $mod+Control+Shift+b exec sed -i 's/\"Bold\"#tag_for_shortcut/\"Regular\"#tag_for_shortcut/g' ~/.config/alacritty/alacritty.toml
 
-# move current workspace to another display
-# bindsym $mod+Control+k move workspace to output HDMI-A-1
-# bindsym $mod+Control+j move workspace to output eDP-1
-# bindsym $mod+Control+j move workspace to output DP-1
-# bindsym $mod+Control+k move workspace to output eDP-1
-# bindsym $mod+Control+k move workspace to output DP-1
-bindsym $mod+Control+j move workspace to output DSI-1
-bindsym $mod+Control+k move workspace to output DP-2
-
 input type:keyboard {
     xkb_layout us
     # xkb_options:
@@ -269,6 +271,9 @@ input type:keyboard {
     #       RightAlt, ~, n = ñ
     xkb_options "ctrl:nocaps,compose:ralt"
 }
+
+# battery warning, check every 60 seconds, warning message every 3 minutes:
+exec --no-startup-id ~/.config/sway/battery-warning.sh
 
 # for screen sharing
 #exec systemctl --user import-environment XDG_SESSION_TYPE XDG_CURRENT_DESKTOP
