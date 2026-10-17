@@ -15,8 +15,8 @@ func (f roundTripFunc) RoundTrip(r *http.Request) (*http.Response, error) { retu
 
 func TestAddedBetween(t *testing.T) {
 	httpClient := &http.Client{Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
-		if r.Header.Get("X-Emby-Token") != "secret" {
-			t.Error("missing API key")
+		if r.Header.Get("Authorization") != `MediaBrowser Token="secret"` || r.Header.Get("X-Emby-Token") != "" {
+			t.Error("expected MediaBrowser API key authorization without legacy token header")
 		}
 		if r.URL.Query().Get("IncludeItemTypes") != "Movie,Episode" {
 			t.Error("wrong item filter")
@@ -45,7 +45,7 @@ func TestAddedBetween(t *testing.T) {
 func TestFindPosterTitleMatchesKindNameAndYear(t *testing.T) {
 	client, err := New("http://jellyfin.test", "secret", "user", &http.Client{Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
 		q := r.URL.Query()
-		if r.URL.Path != "/Items" || (q.Get("SearchTerm") != "Dune" && q.Get("SearchTerm") != "Missing") || q.Get("IncludeItemTypes") != "Movie" || q.Get("Recursive") != "true" || q.Get("UserId") != "user" || r.Header.Get("X-Emby-Token") != "secret" {
+		if r.URL.Path != "/Items" || (q.Get("SearchTerm") != "Dune" && q.Get("SearchTerm") != "Missing") || q.Get("IncludeItemTypes") != "Movie" || q.Get("Recursive") != "true" || q.Get("UserId") != "user" || r.Header.Get("Authorization") != `MediaBrowser Token="secret"` || r.Header.Get("X-Emby-Token") != "" {
 			t.Errorf("unexpected search request: %s", r.URL)
 		}
 		body := `{"Items":[{"Id":"series","Type":"Series","Name":"Dune"},{"Id":"old","Type":"Movie","Name":"Dune","ProductionYear":1984},{"Id":"new","Type":"Movie","Name":"Dune","ProductionYear":2021}]}`

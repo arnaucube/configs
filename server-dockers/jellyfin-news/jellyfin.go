@@ -74,7 +74,7 @@ func (c *Client) AddedBetween(ctx context.Context, start, end time.Time) ([]Item
 		if err != nil {
 			return nil, err
 		}
-		req.Header.Set("X-Emby-Token", c.apiKey)
+		req.Header.Set("Authorization", `MediaBrowser Token="`+c.apiKey+`"`)
 		resp, err := c.http.Do(req)
 		if err != nil {
 			return nil, fmt.Errorf("query Jellyfin: %w", err)
@@ -132,7 +132,7 @@ func (c *Client) FindPosterTitle(ctx context.Context, kind, name string, year in
 	if err != nil {
 		return "", err
 	}
-	req.Header.Set("X-Emby-Token", c.apiKey)
+	req.Header.Set("Authorization", `MediaBrowser Token="`+c.apiKey+`"`)
 	resp, err := c.http.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("search Jellyfin: %w", err)

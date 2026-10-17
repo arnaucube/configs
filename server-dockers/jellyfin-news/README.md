@@ -31,6 +31,8 @@ Copy the example and edit it:
 cp .env.example .env
 ```
 
+Jellyfin requests authenticate with the supported `Authorization: MediaBrowser Token="…"` header, including on Jellyfin 12 with legacy authentication disabled. Keep using your existing `JELLYFIN_API_KEY`.
+
 ## Run with Docker Compose
 
 ```sh

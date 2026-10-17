@@ -14,6 +14,17 @@
 # incus profile device set default eth0 network incusbr0
 #
 #
+# - if the container does not have internet access, at the host do:
+#  sudo iptables -I DOCKER-USER 1 \
+#   -i incusbr0 \
+#   -s 10.159.38.0/24 \
+#   -j ACCEPT
+#
+#  sudo iptables -I DOCKER-USER 2 \
+#   -o incusbr0 \
+#   -d 10.159.38.0/24 \
+#   -m conntrack --ctstate RELATED,ESTABLISHED \
+#   -j ACCEPT
 
 set -e
 

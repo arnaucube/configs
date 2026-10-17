@@ -217,7 +217,7 @@ func (c *Client) Poster(ctx context.Context, id string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("X-Emby-Token", c.apiKey)
+	req.Header.Set("Authorization", `MediaBrowser Token="`+c.apiKey+`"`)
 	resp, err := c.http.Do(req)
 	if err != nil {
 		return nil, err

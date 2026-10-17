@@ -156,7 +156,7 @@ func TestPosterProxy(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			client, err := New("http://jellyfin.test/base", "secret", "", &http.Client{Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
-				if r.URL.Path != "/base/Items/movie/Images/Primary" || r.Header.Get("X-Emby-Token") != "secret" || r.URL.Query().Get("maxWidth") != "480" {
+				if r.URL.Path != "/base/Items/movie/Images/Primary" || r.Header.Get("Authorization") != `MediaBrowser Token="secret"` || r.Header.Get("X-Emby-Token") != "" || r.URL.Query().Get("maxWidth") != "480" {
 					t.Errorf("wrong poster request path, credentials, or size")
 				}
 				return &http.Response{StatusCode: tc.upstream, Body: io.NopCloser(bytes.NewReader(tc.body)), Header: make(http.Header)}, nil

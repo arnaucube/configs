@@ -97,6 +97,7 @@
     keynav
     screenfetch
     libnotify
+    tree
 
     # Editors and terminals
     neovim
