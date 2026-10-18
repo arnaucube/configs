@@ -1,0 +1,3 @@
+[submodule "server-dockers/jellyfin-tools"]
+	path = server-dockers/jellyfin-tools
+	url = git@github.com:arnaucube/jellyfin-tools.git

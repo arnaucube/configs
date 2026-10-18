@@ -1,6 +1,22 @@
 # configs
 config files
 
+## server-dockers
+```sh
+git clone --recurse-submodules git@github.com:arnaucube/configs.git
+
+# or without ssh:
+
+git clone --recurse-submodules https://github.com/arnaucube/configs.git
+
+# or if already cloned the repo, can get the gitsubmodules with:
+git submodule update --init --recursive
+
+
+# update the git submodule:
+git submodule update --remote server-dockers/jellyfin-tools
+```
+
 ## List of utilities for terminal
 - bat https://github.com/sharkdp/bat
 - rg https://github.com/BurntSushi/ripgrep
